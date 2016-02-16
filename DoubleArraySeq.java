@@ -14,10 +14,8 @@
 * @note
 * 	(1) The capacity of one a sequence can change after it's created, but
 *   the maximum capacity is limited by the amount of free memory on the 
-*   machine. The constructor, addAfter, 
-*   addBefore, clone, 
-*   and concatenation will result in an
-*   OutOfMemoryError when free memory is exhausted.
+*   machine. The constructor, addAfter, addBefore, clone, and concatenation 
+*   will result in an OutOfMemoryError when free memory is exhausted.
 *   <p>
 *   (2) A sequence's capacity cannot exceed the maximum integer 2,147,483,647
 *   (Integer.MAX_VALUE). Any attempt to create a larger capacity
@@ -55,20 +53,22 @@ public class DoubleArraySeq implements Cloneable
    
 	//Constructors
 	/**
-	 * Initialize an empty sequence with an initial capacity of 10.  Note that
-	 * the addAfter and addBefore methods work
-	 * efficiently (without needing more memory) until this capacity is reached.
+	 * Initialize an empty sequence with an initial capacity of 10.  
+	 * Note that the addAfter and addBefore methods work efficiently (without needing more memory) until this capacity is reached.
 	 * @param - none
 	 * @postcondition
 	 *   This sequence is empty and has an initial capacity of 10.
 	 * @exception OutOfMemoryError
-	 *   Indicates insufficient memory for: 
-	 *   new double[10].
+	 *   Indicates insufficient memory for: new double[10].
 	 **/   
-	public DoubleArraySeq( )
+	public DoubleArraySeq()
 	{
-		// Implemented by student.
-	}
+		int INITAL_CAPACITY = 10; //Set a default value for new DoubleArraySeq
+		
+		data = new double[INITAL_CAPACITY];
+		manyItems = 0;
+		currentIndex = 0;
+	}//end DoubleArraySeq() method
     
 	/**
 	 * Initialize an empty sequence with a specified initial capacity. Note that
@@ -104,23 +104,24 @@ public class DoubleArraySeq implements Cloneable
 	 *   Indicates that there is no current element, so 
 	 *   getCurrent may not be called.
 	 **/
-	public double getCurrent( )
+	public double getCurrent()
 	{
 		// Implemented by student.
 	}
 	
 	/**
-	 * Accessor method to determine whether this sequence has a specified 
-	 * current element that can be retrieved with the 
-	 * getCurrent method. 
+	 * Accessor method to determine whether this sequence has a specified current element that can be retrieved with the getCurrent method. 
 	 * @param - none
 	 * @return
 	 *   true (there is a current element) or false (there is no current element at the moment)
 	 **/
-	public boolean isCurrent( )
+	public boolean isCurrent()
 	{
-		// Implemented by student.
-	}
+		if (currentIndex >= manyItems)
+			return false;
+		else
+			return true;
+	}//end isCurrent() method
 	
 	/**
 	 * Accessor method to get the current capacity of this sequence. 
@@ -130,53 +131,51 @@ public class DoubleArraySeq implements Cloneable
 	 * @return
 	 *   the current capacity of this sequence
 	 **/
-	public int getCapacity( )
+	public int getCapacity()
 	{
 		// Implemented by student.
 	}
 
 	/**
-	 * Determine the number of elements in this sequence.
+	 * Accessor method to determine the number of elements in this sequence.
 	 * @param - none
 	 * @return
 	 *   the number of elements in this sequence
 	 **/ 
-	public int size( )
+	public int size()
 	{
-		// Implemented by student.
-	}
+		return manyItems;
+	}//end size() method
 	
 	
 	// Setter Methods
 	/**
-	 * Move forward, so that the current element is now the next element in
-	 * this sequence.
+	 * Move forward, so that the current element is now the next element in this sequence.
 	 * @param - none
 	 * @precondition
 	 *   isCurrent() returns true. 
 	 * @postcondition
-	 *   If the current element was already the end element of this sequence 
-	 *   (with nothing after it), then there is no longer any current element. 
-	 *   Otherwise, the new element is the element immediately after the 
-	 *   original current element.
+	 *   If the current element was already the end element of this sequence (with nothing after it), then there is no longer any current element. 
+	 *   Otherwise, the new element is the element immediately after the original current element.
 	 * @exception IllegalStateException
-	 *   Indicates that there is no current element, so 
-	 *   advance may not be called.
+	 *   Indicates that there is no current element, so advance may not be called.
 	 **/
-	public void advance( )
+	public void advance()
 	{
-		// Implemented by student.
-	}
+		if (isCurrent() == true)
+			currentIndex++;
+		else
+			throw new IllegalStateException ("There is no current element, so advance may not be called.");
+	}//end advance() method
 	
 	/**
 	 * Set the current element at the front of this sequence.
 	 * @param - none
 	 * @postcondition
-	 *   The front element of this sequence is now the current element (but 
-	 *   if this sequence has no elements at all, then there is no current 
-	 *   element).
+	 *   The front element of this sequence is now the current element 
+	 *   (but if this sequence has no elements at all, then there is no current element).
 	 **/ 
-	public void start( )
+	public void start()
 	{
 		// Implemented by student.
 	}
@@ -193,44 +192,56 @@ public class DoubleArraySeq implements Cloneable
 	 * @note
 	 *		
 	 **/
-	public void setCurrentLast( )
+	public void setCurrentLast()
 	{
 		
 	}
 	
 	/**
 	 * A method that makes the nth element become the current element.
-	 * Throw an IllegalStateException if the sequence is empty, or if n is greater than the sequence size.
-	 * @param element
-	 *		
+	 * @param n
+	 *   The nth element in the sequence. 
 	 * @postcondition
-	 *		
-	 * @exception OutOfMemoryError
-	 *		
-	 * @note
-	 *		
+	 *   The nth element of this sequence is now the current element 
+	 *   (but if this sequence has no elements at all, then there is no current element).
+	 * @exception IllegalStateException
+	 *   Indicates that the sequence is empty, or n is greater than the sequence size (or less than 1).	
 	 **/
 	public void setCurrent(int n)
 	{
-		
-	}
+		//n is between 1 and manyItems, and the DoubleArraySeq is not empty
+		if (manyItems > 0 && n >= 1 && n <= manyItems)
+			currentIndex = n-1;
+		else
+			throw new IllegalStateException ("The sequence is empty, or n is greater than the sequence size (or less than 1).");
+	}// end setCurrent(int n) method
 	
 	/**
-	 * A method that returns the nth element of the sequence, and make current element to the nth element(n does not represent the array location). 
-	 * Throw an IllegalStateException if the sequence is empty, or if n is greater than the sequence size.
-	 * @param element
-	 *		
+	 * A method that returns the nth element of the sequence, and makes current element the nth element 
+	 * (n does not represent the array location). 
+	 * @param n
+	 *   The nth element in the sequence.
 	 * @postcondition
-	 *		
-	 * @exception OutOfMemoryError
-	 *		
+	 *   The nth element of this sequence is now the current element 
+	 *   (but if this sequence has no elements at all, then there is no current element).
+	 * @exception IllegalStateException
+	 *   Indicates that the sequence is empty, or n is greater than the sequence size (or less than 1).
 	 * @note
 	 *		
 	 **/
 	public double getElement(int n)
 	{
+		double element;
 		
-	}
+		//n is between 1 and manyItems, and the DoubleArraySeq is not empty
+		if (manyItems > 0 && n >= 1 && n <= manyItems){
+			currentIndex = n-1;
+			element = data.getCurrent();
+			return element;
+		}//end if
+		else
+			throw new IllegalStateException ("The sequence is empty, or n is greater than the sequence size (or less than 1).");
+	}//end getElement(int n) method
 	
 	
 	// Size Management Methods
@@ -259,7 +270,7 @@ public class DoubleArraySeq implements Cloneable
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for altering the capacity. 
 	 **/
-	public void trimToSize( )
+	public void trimToSize()
 	{
 		double[ ] trimmedArray;
 		
@@ -418,7 +429,7 @@ public class DoubleArraySeq implements Cloneable
 	 *   Indicates that there is no current element, so 
 	 *   removeCurrent may not be called. 
 	 **/
-	public void removeCurrent( )
+	public void removeCurrent()
 	{
 		// Implemented by student.
 	}
@@ -436,7 +447,7 @@ public class DoubleArraySeq implements Cloneable
 	 * @note
 	 *		
 	 **/
-	public void removeFront( )
+	public void removeFront()
 	{
 		
 	}
@@ -452,7 +463,7 @@ public class DoubleArraySeq implements Cloneable
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for creating the clone.
 	 **/ 
-	public DoubleArraySeq clone( )
+	public DoubleArraySeq clone()
 	{  // Clone a DoubleArraySeq object.
 		DoubleArraySeq answer;
       
@@ -500,9 +511,9 @@ public class DoubleArraySeq implements Cloneable
 	 * @note
 	 *		
 	 **/
-	public String toString( )
+	public String toString()
 	{
 		
 	}
 	
-}// end DoubleArraySeq Class
+}//end DoubleArraySeq class
