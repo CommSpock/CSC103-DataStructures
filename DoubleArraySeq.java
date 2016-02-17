@@ -262,8 +262,7 @@ public class DoubleArraySeq implements Cloneable
 	}
 	
 	/**
-	 * Reduce the current capacity of this sequence to its actual size (i.e., the
-	 * number of elements it contains).
+	 * Reduce the current capacity of this sequence to its actual size (i.e., the number of elements it contains).
 	 * @param - none
 	 * @postcondition
 	 *   This sequence's capacity has been changed to its current size.
@@ -328,8 +327,30 @@ public class DoubleArraySeq implements Cloneable
 	 **/
 	public void addBefore(int element)
 	{
-		// Implemented by student.
-	}
+		//Make sure there is enough capacity to add another element
+		if (data.length == manyItems)
+			ensureCapacity(manyItems*2 + 1);
+		
+		if (isCurrent()){
+			//Move all elements up an index, begging at the end of the DoubleArraySeq and ending at the currentIndex
+			for (int i = manyItems; i > currentIndex; i--){
+				data[i] = data[i-1];
+			}//end for loop
+			//Add the new element before the current element (in the current element's old index)
+			data[currentIndex] = element;
+			manyItems ++;
+		}//end if
+		else { //currentIndex is beyond the last element or the DoubleArraySeq is empty
+			//Move all elements in the sequence up an index (only if currentIndex is beyond the last element)
+			for (int i = manyItems; i > 0; i--){
+				data[i] = data[i-1];
+			}//end for loop
+			//Add the new element to the beginning of the sequence
+			data[0] = element;
+			manyItems ++;
+			currentIndex = 0;
+		}//end else	
+	}//end addBefore(int element) method
 	
 	/**
 	 * A method to add a new element at the front of the sequence and make it the current element.
@@ -366,30 +387,31 @@ public class DoubleArraySeq implements Cloneable
 	/**
 	 * Place the contents of another sequence at the end of this sequence.
 	 * @param addend
-	 *   a sequence whose contents will be placed at the end of this sequence
+	 *   A sequence whose contents will be placed at the end of this sequence
 	 * @precondition
 	 *   The parameter, addend, is not null. 
 	 * @postcondition
-	 *   The elements from addend have been placed at the end of 
-	 *   this sequence. The current element of this sequence remains where it 
-	 *   was, and the addend is also unchanged.
+	 *   The elements from addend have been placed at the end of this sequence. 
+	 *   The current element of this sequence remains where it was, and the addend is also unchanged.
 	 * @exception NullPointerException
 	 *   Indicates that addend is null. 
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory to increase the size of this sequence.
 	 * @note
-	 *   An attempt to increase the capacity beyond
-	 *   Integer.MAX_VALUE will cause an arithmetic overflow
-	 *   that will cause the sequence to fail.
+	 *   An attempt to increase the capacity beyond Integer.MAX_VALUE will cause 
+	 *   an arithmetic overflow that will cause the sequence to fail.
 	 **/
 	public void addAll(DoubleArraySeq addend)
 	{
-		// Implemented by student.
+		//Make sure there is enough capacity to add the other DoubleArraySeq
+		ensureCapacity(manyItems + addend.manyItems);
+		
+		System.arraycopy(addend.data, 0, data, manyItems, addend.manyItems);
+		manyItems += addend.manyItems;
 	}  
 	
 	/**
-	 * Create a new sequence that contains all the elements from one sequence
-	 * followed by another.
+	 * Create a new sequence that contains all the elements from one sequence followed by another.
 	 * @param s1
 	 *   the first of two sequences
 	 * @param s2
@@ -397,21 +419,25 @@ public class DoubleArraySeq implements Cloneable
 	 * @precondition
 	 *   Neither s1 nor s2 is null.
 	 * @return
-	 *   a new sequence that has the elements of s1 followed by the
-	 *   elements of s2 (with no current element)
+	 *   a new sequence that has the elements of s1 followed by the elements of s2 (with no current element)
 	 * @exception NullPointerException.
 	 *   Indicates that one of the arguments is null.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for the new sequence.
 	 * @note
-	 *   An attempt to create a sequence with a capacity beyond
-	 *   Integer.MAX_VALUE will cause an arithmetic overflow
-	 *   that will cause the sequence to fail.
+	 *   An attempt to create a sequence with a capacity beyond Integer.MAX_VALUE will cause 
+	 *   an arithmetic overflow that will cause the sequence to fail.
 	 **/   
 	public static DoubleArraySeq concatenation(DoubleArraySeq s1, DoubleArraySeq s2)
 	{
-		// Implemented by student.
-	}
+		DoubleArraySeq newSequence = new DoubleArraySeq(s1.manyItems + s2.manyItems);
+		
+		System.arraycopy(s1.data, 0, newSequence.data, 0, s1.manyItems);
+		System.arraycopy(s2.data, 0, newSequence.data, s1.manyItems, s2.manyItems);
+		newSequence.manyItems = (s1.manyItems + s2.manyItems);
+		newSequence.currentIndex = 0;
+		return newSequence;
+	}//end concatenation(DoubleArraySeq s1, DoubleArraySeq s2) method
 	
 	
 	// Remove Element Methods
@@ -421,17 +447,22 @@ public class DoubleArraySeq implements Cloneable
 	 * @precondition
 	 *   isCurrent() returns true.
 	 * @postcondition
-	 *   The current element has been removed from this sequence, and the 
-	 *   following element (if there is one) is now the new current element. 
-	 *   If there was no following element, then there is now no current 
-	 *   element.
+	 *   The current element has been removed from this sequence, and the following element (if there is one) is now the new current element. 
+	 *   If there was no following element, then there is now no current element.
 	 * @exception IllegalStateException
-	 *   Indicates that there is no current element, so 
-	 *   removeCurrent may not be called. 
+	 *   Indicates that there is no current element, so removeCurrent may not be called. 
 	 **/
 	public void removeCurrent()
 	{
-		// Implemented by student.
+		if (isCurrent()){
+			//Move each element down an index, starting with the element after the currentIndex
+			for (int i = currentIndex; i < manyItems; i++){
+				data[i] = data[i + 1];
+			}//end for loop
+			manyItems--;
+		}//end if
+		else
+			throw new IllegalStateException("There is no current element, so removeCurrent may not be called.");
 	}
 	
 	/**
@@ -484,19 +515,29 @@ public class DoubleArraySeq implements Cloneable
 	}
 	
 	/**
-	 * A method that returns true if sequence is the same length and order and data, current element could be different.
-	 * @param element
-	 *		
+	 * A method to compare two DoubleArraySeq objects and determine if they are equivalent.
+	 * @param obj
+	 *   The sequence that is being compared to the current sequence.
 	 * @postcondition
-	 *		
-	 * @exception OutOfMemoryError
-	 *		
-	 * @note
-	 *		
+	 *   If the sequences being compared are equivalent, then equals will return true. Otherwise equals will return false. 	
 	 **/
 	public boolean equals(Object obj)
 	{
-		
+		if (obj instanceof DoubleArraySeq){
+			DoubleArraySeq candidate = (DoubleArraySeq) obj;
+			if (this.manyItems == candidate.manyItems){
+				boolean isEqual = true;
+				for (int i = 0; i < manyItems && isEqual; i++){
+					if (this.data[i] != candidate.data[i])
+						isEqual = false;
+				}//end for loop
+				return (isEqual);
+			}//end if
+			else
+				return false;
+		}//end if
+		else
+			return false;
 	}
 	
 	/**
