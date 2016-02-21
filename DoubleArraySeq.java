@@ -5,7 +5,7 @@
 
 
 /******************************************************************************
-* This class is a homework assignment;
+* This class is a homework assignment;  
 * A DoubleArraySeq is a collection of double numbers.
 * The sequence can have a special "current element," which is specified and 
 * accessed through four methods that are not available in the bag class 
@@ -149,7 +149,7 @@ public class DoubleArraySeq implements Cloneable
 		
 		//Returns the number of empty spaces in the array
 		//return data.length - manyItems;
-	}
+	}//end getCapacity() method
 
 	/**
 	 * Accessor method to determine the number of elements in this sequence.
@@ -236,7 +236,7 @@ public class DoubleArraySeq implements Cloneable
 			currentIndex = n-1;
 		else
 			throw new IllegalStateException ("The sequence is either empty or 'n' is greater than the sequence size (or less than 1)!");
-	}// end setCurrent(int n) method
+	}//end setCurrent(int n) method
 	
 	/**
 	 * A method that returns the selected element of the sequence, and makes current element the selected element.
@@ -335,14 +335,14 @@ public class DoubleArraySeq implements Cloneable
 	 * @note
 	 *   An attempt to increase the capacity beyond Integer.MAX_VALUE will cause the sequence to fail with an arithmetic overflow.
 	 **/
-	public void addAfter(int element)
+	public void addAfter(double element)
 	{
 		//Make sure there is enough capacity to add another element.
 		if (data.length == manyItems)
 			ensureCapacity(manyItems*2 + 1);
 		
 		if (isCurrent()){
-			//Move all elements up an index, begging at the end of the DoubleArraySeq and ending at the index after currentIndex. 
+			//Move all elements up an index, beginning at the end of the DoubleArraySeq and ending at the index after currentIndex. 
 			for (int i = manyItems; i > (currentIndex + 1); i--)
 	            data[i] = data[i-1];
 			//Add the new element after the current element.
@@ -356,7 +356,7 @@ public class DoubleArraySeq implements Cloneable
 			data[currentIndex] = element;
 			manyItems++;
 		}//end else
-	}//end addAfter(int element) method
+	}//end addAfter(double element) method
 
 	/**
 	 * A method to add a new element to this sequence, before the current element. 
@@ -373,14 +373,14 @@ public class DoubleArraySeq implements Cloneable
 	 * @note
 	 *   An attempt to increase the capacity beyond Integer.MAX_VALUE will cause the sequence to fail with an arithmetic overflow.
 	 **/
-	public void addBefore(int element)
+	public void addBefore(double element)
 	{
 		//Make sure there is enough capacity to add another element.
 		if (data.length == manyItems)
 			ensureCapacity(manyItems*2 + 1);
 		
 		if (isCurrent()){
-			//Move all elements up an index, begging at the end of the DoubleArraySeq and ending at currentIndex.
+			//Move all elements up an index, beginning at the end of the DoubleArraySeq and ending at currentIndex.
 			for (int i = manyItems; i > currentIndex; i--)
 				data[i] = data[i-1];
 			//Add the new element before the current element (in the current element's old index).
@@ -396,7 +396,7 @@ public class DoubleArraySeq implements Cloneable
 			data[currentIndex] = element;
 			manyItems ++;
 		}//end else	
-	}//end addBefore(int element) method
+	}//end addBefore(double element) method
 	
 	/**
 	 * A method to add a new element at the front of the sequence and make it the current element. 
@@ -475,7 +475,7 @@ public class DoubleArraySeq implements Cloneable
 		//Copy the addend sequence to the end of the invoked sequence.
 		System.arraycopy(addend.data, 0, data, manyItems, addend.manyItems);
 		manyItems += addend.manyItems;
-	}  
+	}// end addAll(DoubleArraySeq addend) method
 	
 	/**
 	 * A method to create a new sequence that contains all the elements from one sequence followed by another.
@@ -537,7 +537,7 @@ public class DoubleArraySeq implements Cloneable
 		}//end if
 		else
 			throw new IllegalStateException ("There is no current element!");
-	}
+	}//end removeCurrent() method
 	
 	/**
 	 * A method to remove the first element of the sequence. 
@@ -621,7 +621,7 @@ public class DoubleArraySeq implements Cloneable
 		}//end if
 		else
 			return false;
-	}
+	}//end equals(Object obj)
 	
 	/**
 	 * A method to print all elements of the sequence in order, separated by a space.
