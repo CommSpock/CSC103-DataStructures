@@ -158,7 +158,7 @@ public class DoubleArraySeq implements Cloneable
 	{
 		//Returns the number of empty indexes in the array.
 		return data.length - manyItems;
-	}//end getCapacity() method
+	}//end getAvailCapacity() method
 
 	/**
 	 * Accessor method to determine the number of elements in this sequence.
