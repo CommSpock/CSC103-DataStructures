@@ -146,9 +146,18 @@ public class DoubleArraySeq implements Cloneable
 	{
 		//Returns the number of indexes in the array.
 		return data.length;
-		
-		//Returns the number of empty spaces in the array
-		//return data.length - manyItems;
+	}//end getCapacity() method
+	
+	/**
+	 * Accessor method to get the available capacity (number of empty indexes) of this sequence.
+	 * @param - none
+	 * @return
+	 *   The available capacity (number of empty indexes) of this sequence.
+	 **/
+	public int getAvailCapacity()
+	{
+		//Returns the number of empty indexes in the array.
+		return data.length - manyItems;
 	}//end getCapacity() method
 
 	/**
@@ -192,20 +201,25 @@ public class DoubleArraySeq implements Cloneable
 	 * @postcondition
 	 *   The front element of this sequence is now the current element 
 	 *   (but if this sequence has no elements at all, then there is no current element).
+	 * @exception IllegalStateException
+	 *   Indicates that the sequence is empty.	
 	 **/ 
 	public void start()
 	{
 		if (manyItems > 0)
 			currentIndex = 0;
-		//else
-		//	System.out.println("There is no current element!");
+		else
+			throw new IllegalStateException("This sequence is empty!");
 	}//end start() method
 	
 	/**
 	 * A method that makes the last element of the sequence the current element. 
 	 * @param none
+	 * @precondition
+	 *   The sequence may not be empty. 
 	 * @postcondition
 	 *   The last element in the sequence has been set to the current index.
+	 *   (but if this sequence has no elements at all, then there is no current element).
 	 * @exception IllegalStateException
 	 *   Indicates that the sequence is empty.	
 	 **/
@@ -218,49 +232,59 @@ public class DoubleArraySeq implements Cloneable
 	}//end setCurrentLast() method
 	
 	/**
-	 * A method that makes the nth element become the current element.
+	 * A method that makes the nth element become the current element and returns its value.
 	 * @param n
 	 *   The nth element in the sequence.
 	 * @precondition
 	 *   'n' must range from 1 to manyItems and the sequence may not be empty.
 	 * @postcondition
-	 *   The nth element of this sequence is now the current element.
+	 *   The nth element of this sequence is now the current element and it's value has been returned.
 	 *   If this sequence has no elements at all, then there is no current element.
 	 * @exception IllegalStateException
 	 *   Indicates that the sequence is empty, or n is greater than the sequence size (or less than 1).	
 	 **/
-	public void setCurrent(int n)
+	public double setCurrent(int n)
 	{
 		//'n' must range from 1 to manyItems and the DoubleArraySeq may not be empty.
-		if (manyItems > 0 && n > 0 && n <= manyItems)
+		if (manyItems > 0 && n > 0 && n <= manyItems){
 			currentIndex = n-1;
+			return data[currentIndex];
+		}//end if
 		else
-			throw new IllegalStateException ("The sequence is either empty or 'n' is greater than the sequence size (or less than 1)!");
+			throw new IllegalStateException ("This sequence is either empty or 'n' is greater than the sequence size (or less than 1)!");
 	}//end setCurrent(int n) method
 	
 	/**
-	 * A method that returns the selected element of the sequence, and makes current element the selected element.
+	 * A method that and makes the selected element the current element and returns what nth number of the sequence that element is.
 	 * @param element
 	 *   The selected element in the sequence.
+	 * @precondition
+	 *   The sequence may not be empty.
 	 * @postcondition
-	 *   The selected element of this sequence has been returned and is now the current element. 
+	 *   The selected element of this sequence is now the current element, and what nth number of the sequence that element is has been returned.
 	 *   If this sequence has no elements at all, then there is no current element.
+	 *   If the sequence does not contain the element, then the current element does not change. 
 	 * @exception IllegalStateException
 	 *   Indicates that the sequence is empty, or the selected element does not exist in the sequence.	
 	 **/
-	/*
-	public double getElement(double element)
+	public int getElement(double element)
 	{		
-		//n is between 1 and manyItems, and the DoubleArraySeq is not empty
-		if (manyItems > 0 && n >= 1 && n <= manyItems){
-			currentIndex = n-1;
-			element = data.getCurrent();
-			return element;
-		}//end if
+		//Verify that the sequence is not empty.
+		if (manyItems < 1)
+			throw new IllegalStateException ("This sequence is empty!");
+		//Search for the element in the sequence and return what nth number of the sequence that element is, if found. 
+		int i;
+		for (i = 0; i < manyItems; i++){
+			if (data[i] == element){
+				currentIndex = i;
+				return currentIndex + 1;
+			}//end if
+		}//end for
+		if (i == manyItems)
+			throw new IllegalStateException ("This sequence does not contain the element " + element + "!");
 		else
-			throw new IllegalStateException ("The sequence is empty, or the selected element does not exist in the sequence.");
+			return 0;
 	}//end getElement(double element) method
-	*/
 	
 	
 	// Size Management Methods
@@ -284,7 +308,6 @@ public class DoubleArraySeq implements Cloneable
 				System.arraycopy(data, 0, expandData, 0, manyItems);
 				//Change data's reference to expandData.
 				data = expandData;
-				//expandData = null;
 			}//end if
 		}//end try
 		catch (OutOfMemoryError e){
@@ -475,7 +498,7 @@ public class DoubleArraySeq implements Cloneable
 		//Copy the addend sequence to the end of the invoked sequence.
 		System.arraycopy(addend.data, 0, data, manyItems, addend.manyItems);
 		manyItems += addend.manyItems;
-	}// end addAll(DoubleArraySeq addend) method
+	}//end addAll(DoubleArraySeq addend) method
 	
 	/**
 	 * A method to create a new sequence that contains all the elements from one sequence followed by another.
@@ -603,6 +626,8 @@ public class DoubleArraySeq implements Cloneable
 	 **/
 	public boolean equals(Object obj)
 	{
+		boolean areEqual = false;
+		
 		//Verify 1) That obj is a DoubleArraySeq.
 		if (obj instanceof DoubleArraySeq){
 			DoubleArraySeq candidate = (DoubleArraySeq) obj;
@@ -614,13 +639,11 @@ public class DoubleArraySeq implements Cloneable
 					if (this.data[i] != candidate.data[i])
 						isEqual = false;
 				}//end for loop
-				return (isEqual);
+				if (isEqual)
+					areEqual = true;
 			}//end if
-			else
-				return false;
 		}//end if
-		else
-			return false;
+		return areEqual;
 	}//end equals(Object obj)
 	
 	/**
