@@ -51,124 +51,184 @@ public class UnboundedInt implements Cloneable {
 	private int nodeCount;
 	
 	
-	//Constructors
+	///// Constructors /////
 	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - none
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
 	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates
 	 **/ 
 	public UnboundedInt()
 	{
-		tail = new IntNode(0, null);
-		head = new IntNode(0, tail);
-		nodeCount = 0;
-		cursor = head.getLink();
-		
-	}//end UnboundedInt() constructor
-	
-	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
-	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
-	 **/ 
-	public UnboundedInt(int... bigInt)
-	{
-		tail = new IntNode(0, null);
-		head = new IntNode(0, tail);
+		head = null;
+		tail = null;
+		cursor = null;
 		nodeCount = 0;
 		
-		for (int smallInt: bigInt){
-			//Set the tail node to the first bigInt one time.
-			if (tail.getData() == 0){
-				tail.setData(smallInt);
-				nodeCount ++;
-			}//end if
-			//Add the next smallInt to the following node, moving toward the head node.
-			else {
-				head.addNodeAfter(smallInt);
-				nodeCount ++;
-			}//end else			
-		}//end for
-		
-		//Set the head node to the nodeCount of this UnboundedInt
-		head.setData(nodeCount);
-		
-		//Set cursors.
-		cursor = head.getLink();
-		
-	}//end UnboundedInt(int... bigInt) constructor
-	
+	}//End UnboundedInt() constructor
 	
 	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
 	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates
 	 **/ 
-	public void start()
-	{
-		cursor = head.getLink();
-	}
-		
-	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
-	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
-	 **/ 
-	public void advance()
-	{
-		cursor = cursor.getLink();
-	}
+	public UnboundedInt(int... elements)
+	{		
+		for (int element: elements){
+			addFront(element);
+		}
+	}//End UnboundedInt(int... elements) constructor
 	
+	
+	///// Accessor Methods /////
 	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
 	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates
 	 **/ 
 	public int getElement()
 	{
 		return cursor.getData();
-	}
-	
+	}//End getElement() Method
 	
 	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
 	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates 
 	 **/ 
-	public void addEnd(int smallInt)
+	public int getNodeCount()
 	{
-		tail.addNodeAfter(smallInt);
-		tail = tail.getLink();
-		cursor = tail;
-	}
+		return nodeCount;
+	}//End getNodeCount() Method
+	
+	
+	///// Setter Methods /////
+	/**
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
+	 * @postcondition
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates 
+	 **/ 
+	public void start()
+	{
+		cursor = head;
+	}//End start() Method
+		
+	/**
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
+	 * @postcondition
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates
+	 **/ 
+	public void advance()
+	{
+		try {
+			cursor = cursor.getLink();
+		} 
+		catch (NullPointerException e){}
+	}//End advance() Method
+	
+	
+	///// Modify Methods /////
+	/**
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
+	 * @postcondition
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates 
+	 **/ 
+	public void addFront(int element)
+	{
+		if (head == null){
+			head = new IntNode(element, null);
+			tail = head;
+			cursor = head;
+		}
+		else {
+			IntNode newNode = new IntNode(element, head);
+			head = newNode;
+			cursor = head;
+		}
+		nodeCount++;
+	}//End addFront(int element) Method
 	
 	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
 	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates 
 	 **/ 
-	public UnboundedInt add(UnboundedInt addend)
+	public void addEnd(int element)
+	{
+		if (tail == null){
+			tail = new IntNode(element, null);
+			head = tail;
+			cursor = tail;
+		}
+		else {
+			tail.addNodeAfter(element);
+			tail = tail.getLink();
+			cursor = tail;
+		}
+		nodeCount++;
+	}//End addEnd(int element) Method
+	
+	
+	///// Arithmetic Operators /////
+	/**
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
+	 * @postcondition
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates 
+	 **/ 
+	public UnboundedInt add(UnboundedInt addendInt)
 	{
 		//Instance Variables
 		int sum;
@@ -180,219 +240,192 @@ public class UnboundedInt implements Cloneable {
 		
 		//Set cursors for all UnboundedInt's to the hundreds place of their linked list
 		start();
-		addend.start();
-		summedInt.start();
+		addendInt.start();
 
-		//Sum nodes and write summedInt - Part I
-		while (cursor != null && addend.cursor != null){
-			sum = getElement() + addend.getElement();
+		//Sum node pairs and compose summedInt until one UnboundedInt runs out of nodes - Part I
+		while (cursor != null && addendInt.cursor != null){
+			
+			//Get the sum of the current nodes
+			sum = getElement() + addendInt.getElement();
+			
 			if (remainder == true){
 				sum = sum + REMAINDER;
 			}
+			
 			if (sum > CRITICAL){
 				sum = sum - THOUSAND;
-				if (summedInt.tail.getData() == 0){
-					summedInt.tail.setData(sum);
-				}
-				else {
-					summedInt.addEnd(sum);
-				}
-				advance();
-				addend.advance();
-				summedInt.nodeCount ++;
+				summedInt.addEnd(sum);
 				remainder = true;
-			}//end if
+			}
 			else {
-				if (summedInt.tail.getData() == 0){
-					summedInt.tail.setData(sum);
-				}
-				else {
-					summedInt.addEnd(sum);
-				}
-				advance();
-				addend.advance();
-				summedInt.nodeCount ++;
+				summedInt.addEnd(sum);
 				remainder = false;
-			}//end else
+			}
+			
+			//Advance to the next pair of nodes
+			advance();
+			addendInt.advance();
 		}//end while
 
-		//Write summedInt - Part II
-		while (cursor != null || addend.cursor != null || remainder == true){
+		//Finish composing summedInt if any UnboundedInt runs out of nodes or a remainder is left  - Part II
+		while (cursor != null || addendInt.cursor != null || remainder == true){
+			
+			//Handle any cases where a remainder exists
 			if (remainder == true){
-				if (cursor == null && addend.cursor == null){
+				if (cursor == null && addendInt.cursor == null){
 					summedInt.addEnd(REMAINDER);
-					summedInt.nodeCount ++;
 					remainder = false;
 				}
 				else if (cursor != null){
-					summedInt.addEnd(getElement() + REMAINDER);
-					if (summedInt.getElement() > CRITICAL){
-						summedInt.cursor.setData(0);
-						summedInt.nodeCount ++;
-						advance();
+					sum = getElement() + REMAINDER;
+					if (sum > CRITICAL){
+						sum = sum - THOUSAND;
+						summedInt.addEnd(sum);
 						remainder = true;
 					}
 					else {
-						summedInt.nodeCount ++;
-						advance();
+						summedInt.addEnd(sum);
 						remainder = false;
 					}
 				}//end else if
-				else if (addend.cursor != null){
-					summedInt.addEnd(addend.getElement() + REMAINDER);
-					if (summedInt.getElement() > CRITICAL){
-						summedInt.cursor.setData(0);
-						summedInt.nodeCount ++;
-						advance();
+				else if (addendInt.cursor != null){
+					sum = addendInt.getElement() + REMAINDER;
+					if (sum > CRITICAL){
+						sum = sum - THOUSAND;
+						summedInt.addEnd(sum);
 						remainder = true;
 					}
 					else {
-						summedInt.nodeCount ++;
-						advance();
+						summedInt.addEnd(sum);
 						remainder = false;
 					}
 				}//end else if
 			}//end if
+			
+			//Handle any cases where a remainder does not exists
 			else if (remainder == false){
 				if (cursor != null){
 					summedInt.addEnd(getElement());
-					summedInt.nodeCount ++;
-					advance();
 				}
-				else if (addend.cursor != null){
-					summedInt.addEnd(addend.getElement());
-					summedInt.nodeCount ++;
-					advance();
+				else if (addendInt.cursor != null){
+					summedInt.addEnd(addendInt.getElement());
 				}
 			}//end else if
+			
+			//Advance to any remaining nodes
+			advance();
+			addendInt.advance();
 		}//end while
 		
 		//Return summedInt, sum of both UnboundedInt's
-		summedInt.head.setData(nodeCount);
 		summedInt.start();
 		return summedInt;
-	}//end add(UnboundedInt addend) method
-	
+		
+	}//End add(UnboundedInt addend) method
 	
 	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
 	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates  
 	 **/ 
-	public UnboundedInt multiply(UnboundedInt multiplier){
-		UnboundedInt productInt = new UnboundedInt();
+	public UnboundedInt multiply(UnboundedInt multiplierInt){
 		
-		multiplier.start();
-		
-		for (int i = 0; i < multiplier.head.getData(); i++){
-			for (int j = 0; j < multiplier.cursor.getData(); j++){
-				productInt = productInt.add(this);
-			}
-		}
-		return productInt;
-	}//end multiply(UnboundedInt multiplier) method
+	}//End multiply(UnboundedInt multiplier) method
 	
 	
+	///// Overridden and Static Methods /////
 	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
 	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates 
 	 **/ 
 	public UnboundedInt clone(){
 		
-	}
+	}//End clone() Method
 	
 	
 	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
 	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates  
 	 **/ 
 	public boolean equals(Object obj){
 		
-	}
+	}//end equals(Object obj) Method
 	
 	
 	/**
-	 * Initializes and instantiates a new unbounded integer of arbitrary length.  
-	 * @param - bigInt
+	 * Method Description  
+	 * @param - parameter
+	 *   Parameter Description
+	 * @precondition
+	 *   Preconditions
 	 * @postcondition
-	 *   
-	 * @exception OutOfMemoryError
-	 *   
+	 *   Postconditions
+	 * @exception Exception
+	 *   Indicates 
 	 **/ 
 	public String toString()
 	{
-		String bigInt = "";
+		String unboundedInt = "";
 		
 		//Set cursor for UnboundedInt to the hundreds place of the linked list
 		start();
 		
 		//Write the hundreds node
-		bigInt = Integer.toString(cursor.getData());
-		if (head.getData() == 1){
-			bigInt = Integer.toString(getElement());
+		unboundedInt = Integer.toString(cursor.getData());
+		if (nodeCount == 1){
+			unboundedInt = Integer.toString(getElement());
 		}
 		else if (cursor.getData() < 10){
-			bigInt = "00" + bigInt;
+			unboundedInt = "00" + unboundedInt;
 		}
 		else if (cursor.getData() < 100){
-			bigInt = "0" + bigInt;
+			unboundedInt = "0" + unboundedInt;
 		}
 		advance();
+		
 		//Write the following nodes
 		while (cursor != null){
 			if (getElement() < 10 && cursor.getLink() == null){
-				bigInt = Integer.toString(getElement()) + "," + bigInt;
+				unboundedInt = Integer.toString(getElement()) + "," + unboundedInt;
 			}
 			else if (getElement() < 10){
-				bigInt = "00" + Integer.toString(getElement()) + "," + bigInt;
+				unboundedInt = "00" + Integer.toString(getElement()) + "," + unboundedInt;
 			}
 			else if (getElement() < 100 && cursor.getLink() == null){
-				bigInt = Integer.toString(getElement()) + "," + bigInt;
+				unboundedInt = Integer.toString(getElement()) + "," + unboundedInt;
 			}
 			else if (getElement() < 100){
-				bigInt = "0" + Integer.toString(getElement()) + "," + bigInt;
+				unboundedInt = "0" + Integer.toString(getElement()) + "," + unboundedInt;
 			}
 			else if (getElement() >= 100){
-				bigInt = Integer.toString(getElement()) + "," + bigInt;
+				unboundedInt = Integer.toString(getElement()) + "," + unboundedInt;
 			}
 			advance();
 		}//end while
-		return bigInt;
-	}
-	
-	
-	
-	
-	
-	
-	public static void main(String[] args) {
 		
-		UnboundedInt testInt1 = new UnboundedInt(105,256,987,352,501,248,392);
-		UnboundedInt testInt2 = new UnboundedInt(1,423,198,764,321,146);
+		return unboundedInt;
 		
-		UnboundedInt testIntSum = testInt1.add(testInt2);
-		
-		System.out.println(testIntSum.toString());
-		System.out.println("105,258,410,551,265,569,538");
-		
-		
-	}
+	}//End toString() Method
 	
 	
-	
-	
-	
-	
-
 }//End UnboundedInt Class
