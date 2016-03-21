@@ -423,61 +423,62 @@ public class UnboundedInt implements Cloneable {
 	 **/ 
 	public UnboundedInt multiply(UnboundedInt multiplierInt)
 	{
-		//Constants
-		final int ZERO = 0;
-		final int THOUSAND = 1000;
-		
-		//Verify that neither the invoked UnboundedInt or multiplierInt are empty
-		if (this.nodeCount != ZERO && multiplierInt.nodeCount!= ZERO){
-			//Make a variable to hold the carryover
-			int carryOver = ZERO;
-			//Make a variable to keep track of zeros
-			int zeroCount = ZERO;
+		//check that both numbers are not empty
+		if (this.nodeCount != 0 && multiplierInt.nodeCount!= 0){
+			//make a variable to hold the carryover
+			int carryOver = 0;
+			//make a variable to keep track of zeros
+			int zeroCount = 0;
 			
 			UnboundedInt total = new UnboundedInt();
+			total.addEnd(0);
 			
 			int currentProduct;
 			
+			//zero constant
+			final int ZERO = 0;
+			
 			for (IntNode thisCursor = head; thisCursor !=null; thisCursor = thisCursor.getLink()){
-				//Set carryOver to 0 when starting a new node
-				carryOver = ZERO;
+				//set carryOver to 0 when starting a new node
+				carryOver = 0;
 				
-				//Check if this needs to be set to null each time
+				//check if this needs to be set to null each time
 				UnboundedInt uCurrentTotal = new UnboundedInt();
 				
-				for (int i = ZERO; i<zeroCount; i++){
+				for (int i = 0; i<zeroCount; i++){
 					uCurrentTotal.addEnd(ZERO);
 				}
 				
-				//Start calculating the inputInt digits
+				//start calculating the inputInt digits
 				for (IntNode inputCursor = multiplierInt.head; inputCursor !=null; inputCursor = inputCursor.getLink()){
 					currentProduct = (inputCursor.getData() * thisCursor.getData()) + carryOver;
 					//carryOver happens if the currentProduct is larger than 1000
-					carryOver = currentProduct/THOUSAND;
+					carryOver = currentProduct/1000;
 					
-					//Make sure currentProduct does not exceed 1000 so set it to mod 1000
-					currentProduct = currentProduct%THOUSAND;
+					//make sure currentProduct does not exceed 1000 so set it to mod 1000
+					currentProduct = currentProduct%1000;
 					
 					uCurrentTotal.addEnd(currentProduct);
 				}//end loop
 				//need to check for carryOver that might be left over
-				if (carryOver > ZERO){
+				if (carryOver > 0){
 					uCurrentTotal.addEnd(carryOver);
 				}
 				//add to the total
-				total.add(uCurrentTotal);
+				total = total.add(uCurrentTotal);
 				
 				uCurrentTotal = null;
 				
 				zeroCount++;
-			}//end for
+				}//end of outer loop
 			
 			total.start();
 			return total;
-		}//end if
+		}//end of multiply
 		else {
-			throw new IllegalStateException("One of the UnboundedInts is empty!");
+			throw new IllegalStateException("There is nothing in this number!");
 		}
+		
 	}//End multiply(UnboundedInt multiplierInt) method
 	
 	
