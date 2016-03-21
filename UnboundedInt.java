@@ -303,18 +303,19 @@ public class UnboundedInt implements Cloneable {
 	 *   An UnboundedInt may be added to itself. 
 	 * @return
 	 *   Returns the sum of the invoked UnboundedInt and the addendInt as a new UnboundedInt. 
-	 *   The returned UnboundedInt's currently selected element is the element containing the 
-	 *   ones place.
+	 *   The returned UnboundedInt's currently selected element is the element containing the ones place.
 	 **/ 
 	public UnboundedInt add(UnboundedInt addendInt)
 	{
 		//Instance Variables
 		int sum;
+		boolean remainder = false;
+		UnboundedInt summedInt = new UnboundedInt();
+		
+		//Constants
 		final int REMAINDER = 1;
 		final int THOUSAND = 1000;
 		final int CRITICAL = 999;
-		boolean remainder = false;
-		UnboundedInt summedInt = new UnboundedInt();
 		
 		//Account for adding an UnboundedInt to itself
 		if (addendInt == this){
@@ -408,62 +409,59 @@ public class UnboundedInt implements Cloneable {
 	}//End add(UnboundedInt addend) method
 	
 	/**
-	 * Multiplies two UnboundedInts together
+	 * A method to multiply one unboundedInt by another UnboundedInt and return their product.  
+	 * @param - multiplierInt
+	 *   The UnboundedInt to multiply the invoked UnboundedInt by.
 	 * @precondition
-	 *  Neither integer can be empty or it will throw a null pointer exception
-	 * @postcondition
-	 *  Integers have been multiplied together
-	 * 
-	 * Method Description  
-	 * @param - parameter
-	 *   Parameter Description
-	 * @precondition
-	 *   Preconditions
+	 *   Neither the invoked UnboundedInt or multiplierInt may be empty.
+	 *   An UnboundedInt may be multiplied by itself. 
 	 * @return
-	 *   Postconditions
-	 * @exception Exception
-	 *   Indicates  
+	 *   Returns the product of the invoked UnboundedInt and the multiplierInt as a new UnboundedInt. 
+	 *   The returned UnboundedInt's currently selected element is the element containing the ones place.
+	 * @exception IllegalStateException
+	 *   Indicates that either the invoked UnboundedInt or the multiplierInt is empty. 
 	 **/ 
 	public UnboundedInt multiply(UnboundedInt multiplierInt)
 	{
-		//check that both numbers are not empty
-		if (this.nodeCount != 0 && multiplierInt.nodeCount!= 0){
-			//make a variable to hold the carryover
-			int carryOver = 0;
-			//make a variable to keep track of zeros
-			int zeroCount = 0;
+		//Constants
+		final int ZERO = 0;
+		final int THOUSAND = 1000;
+		
+		//Verify that neither the invoked UnboundedInt or multiplierInt are empty
+		if (this.nodeCount != ZERO && multiplierInt.nodeCount!= ZERO){
+			//Make a variable to hold the carryover
+			int carryOver = ZERO;
+			//Make a variable to keep track of zeros
+			int zeroCount = ZERO;
 			
 			UnboundedInt total = new UnboundedInt();
 			
 			int currentProduct;
 			
-			//zero constant
-			final int ZERO = 0;
-			
 			for (IntNode thisCursor = head; thisCursor !=null; thisCursor = thisCursor.getLink()){
-				//set carryOver to 0 when starting a new node
-				carryOver = 0;
+				//Set carryOver to 0 when starting a new node
+				carryOver = ZERO;
 				
-				//check if this needs to be set to null each time
+				//Check if this needs to be set to null each time
 				UnboundedInt uCurrentTotal = new UnboundedInt();
 				
-				for (int i = 0; i<zeroCount; i++){
+				for (int i = ZERO; i<zeroCount; i++){
 					uCurrentTotal.addEnd(ZERO);
 				}
 				
-				//start calculating the inputInt digits
+				//Start calculating the inputInt digits
 				for (IntNode inputCursor = multiplierInt.head; inputCursor !=null; inputCursor = inputCursor.getLink()){
 					currentProduct = (inputCursor.getData() * thisCursor.getData()) + carryOver;
 					//carryOver happens if the currentProduct is larger than 1000
-					carryOver = currentProduct/1000;
+					carryOver = currentProduct/THOUSAND;
 					
-					//make sure currentProduct does not exceed 1000 so set it to mod 1000
-					currentProduct = currentProduct%1000;
+					//Make sure currentProduct does not exceed 1000 so set it to mod 1000
+					currentProduct = currentProduct%THOUSAND;
 					
 					uCurrentTotal.addEnd(currentProduct);
 				}//end loop
 				//need to check for carryOver that might be left over
-				if (carryOver > 0){
+				if (carryOver > ZERO){
 					uCurrentTotal.addEnd(carryOver);
 				}
 				//add to the total
@@ -472,36 +470,32 @@ public class UnboundedInt implements Cloneable {
 				uCurrentTotal = null;
 				
 				zeroCount++;
-			}//end of outer loop
+			}//end for
 			
+			total.start();
 			return total;
-		}//end of multiply
+		}//end if
 		else {
-			throw new IllegalStateException("There is nothing in this number!");
+			throw new IllegalStateException("One of the UnboundedInts is empty!");
 		}
 	}//End multiply(UnboundedInt multiplierInt) method
 	
 	
 	///// Overridden and Static Methods /////
 	/**
-	 * Generate a copy of an UnboundedInt
+	 * A method to generate an independent copy (clone) of this UnboundedInt.  
+	 * @param - none
 	 * @return
-	 *   The return value is a copy of this UnboundedInt. Subsequent changes to the
-	 *   copy will not affect the original, nor vice versa. 
+	 *   The return value is an independent copy (clone) of this UnboundedInt.
+	 *   The copy's currently selected element is the element containing the ones place.
+	 *   Subsequent changes to the copy will not affect the original, nor vice versa.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for creating the clone.
-	 * 
-	 * Method Description  
-	 * @param - parameter
-	 *   Parameter Description
-	 * @precondition
-	 *   Preconditions
-	 * @return
-	 *   Postconditions
-	 * @exception Exception
-	 *   Indicates 
-	 **/ 
-	public Object clone(){
+	 * @exception RuntimeException
+	 *   Indicates this class does not implement cloneable.
+	 **/
+	public Object clone()
+	{
 		UnboundedInt clonedInt;
 		IntNode[] nodeArray;
 		
@@ -511,30 +505,55 @@ public class UnboundedInt implements Cloneable {
 		catch (CloneNotSupportedException e){
 			throw new RuntimeException ("This class does not implement cloneable.");
 		}
-		//assign head and tail to an array
+		//Assign head and tail to an array
 		nodeArray = IntNode.listCopyWithTail(head);
 		
-		//assign the head and tail to the head and tail references of the array
+		//Assign the head and tail to the head and tail references of the array
 		clonedInt.head = nodeArray[0];
 		clonedInt.tail = nodeArray[1];
-		//make sure to set the cursor to the tail of the array
+		//Make sure to set the cursor to the tail of the array
 		clonedInt.cursor = clonedInt.tail;
 		
+		clonedInt.start();
 		return clonedInt;
+		
 	}//End clone() Method
 	
 	/**
-	 * Method Description  
-	 * @param - parameter
-	 *   Parameter Description
-	 * @precondition
-	 *   Preconditions
+	 * A method to compare two UnboundedInt objects and determine if they are equivalent.  
+	 * @param - obj
+	 *   The UnboundedInt that is being compared to the current UnboundedInt.
 	 * @postcondition
-	 *   Postconditions
-	 * @exception Exception
-	 *   Indicates  
+	 *   If the UnboundedInt's being compared are equivalent, then equals will return true. 
+	 *   Otherwise equals will return false.
 	 **/ 
-	public boolean equals(Object obj){
+	public boolean equals(Object obj)
+	{
+		boolean areEqual = false;
+		
+		//Verify 1) That obj is an UnboundedInt.
+		if (obj instanceof UnboundedInt){
+			UnboundedInt candidate = (UnboundedInt) obj;
+			//Verify 2) That candidate has the same number of elements as the invoked UnboundedInt.
+			if (nodeCount == candidate.nodeCount){
+				//Verify 3) That the elements in candidate and the invoked DoubleArraySeq are the same elements, in the same order.
+				boolean isEqual = true;
+				start();
+				candidate.start();
+				while (cursor != null && isEqual){
+					if (getElement() != candidate.getElement()){
+						isEqual = false;
+					}
+					advance();
+					candidate.advance();
+				}//end while
+				if (isEqual){
+					areEqual = true;
+				}
+			}//end if
+		}//end if
+		
+		return areEqual;
 		
 	}//end equals(Object obj) Method
 	
