@@ -1,4 +1,4 @@
-// File: UnboundedInt.java 
+// File: UnboundedInt.java
 
 // Project #2: Chapter 4, project 10 - UnboundedInt Linked List
 // Authors: Rafael Ferrer and Carmen Chiu
@@ -51,7 +51,7 @@ public class UnboundedInt implements Cloneable {
 	/**
 	 * Default constructor to initialize an empty UnboundedInt with no integer elements, 
 	 * until elements are added with addFront(int element) or addEnd(int element).
-	 * @param - none
+	 * @param none
 	 * @postcondition
 	 *   This UnboundedInt is empty, with no integer elements.
 	 **/ 
@@ -69,7 +69,7 @@ public class UnboundedInt implements Cloneable {
 	 * three integers. The UnboundedInt should be entered from the highest multiple of ten to the 
 	 * ones place, with a comma after each element (except the last element). No element may be 
 	 * negative and leading zeros should not be included in any element.  
-	 * @param - elements
+	 * @param elements
 	 *   An arbitrary number of one, two, or three integer positive elements, entered from 
 	 *   UnaboundedInt's highest multiple of 10 to the ones place, with a comma after each element.
 	 * @precondition
@@ -83,7 +83,7 @@ public class UnboundedInt implements Cloneable {
 	 *   Indicates an element is negative or greater than three integers long.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for new UnboundedInt.
-	 * @exception RunTimeError
+	 * @exception RunTimeException
 	 *   May occur if an element contains leading zeros. 
 	 * @note
 	 *   If an element contains leading zeros and there is no compilation or runtime error, then the 
@@ -113,7 +113,7 @@ public class UnboundedInt implements Cloneable {
 	///// Accessor Methods /////
 	/**
 	 * Accessor method to get the currently selected integer element of the UnboundedInt.
-	 * @param - none
+	 * @param none
 	 * @precondition
 	 *   There must currently be a non-null element selected.
 	 * @return
@@ -135,7 +135,7 @@ public class UnboundedInt implements Cloneable {
 	
 	/**
 	 * Accessor method to get the number of integer elements composing the UnboundedInt.  
-	 * @param - none
+	 * @param none
 	 * @precondition
 	 *   The UnboundedInt may not be null.
 	 * @return
@@ -152,7 +152,7 @@ public class UnboundedInt implements Cloneable {
 	/**
 	 * A method to set the currently selected element to the element containing the ones place
 	 * of the UnboundedInt.  
-	 * @param - none
+	 * @param none
 	 * @postcondition
 	 *   The element containing the ones place of the UnboundedInt is now the currently selected
 	 *   element.
@@ -166,7 +166,7 @@ public class UnboundedInt implements Cloneable {
 	/**
 	 * A method to make the next element (next highest three digit placeholder of UnboundedInt) after 
 	 * the currently selected element the new currently selected element of the UnboundedInt.
-	 * @param - none
+	 * @param none
 	 * @precondition
 	 *   There must currently be a non-null element selected.
 	 * @postcondition
@@ -192,7 +192,7 @@ public class UnboundedInt implements Cloneable {
 	/**
 	 * A method to add additional positive elements of one, two, or three integers to the UnboundedInt 
 	 * before the current ones place. Leading zeros should not be included in element.
-	 * @param - element
+	 * @param element
 	 *   A positive one, two, or three integer element.
 	 * @precondition
 	 *   The element is positive, one, two, or three integers long, and contains no leading zeros.
@@ -204,7 +204,7 @@ public class UnboundedInt implements Cloneable {
 	 *   Indicates the element is negative or greater than three integers long.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for new UnboundedInt.
-	 * @exception RunTimeError
+	 * @exception RunTimeException
 	 *   May occur if element contains leading zeros. 
 	 * @note
 	 *   If element contains leading zeros and there is no compilation or runtime error, then the 
@@ -244,7 +244,7 @@ public class UnboundedInt implements Cloneable {
 	/**
 	 * A method to add additional positive elements of one, two, or three integers to the UnboundedInt 
 	 * after its current highest multiple of ten. Leading zeros should not be included in element.
-	 * @param - element
+	 * @param element
 	 *   A positive one, two, or three integer element.
 	 * @precondition
 	 *   The element is positive, one, two, or three integers long, and contains no leading zeros.
@@ -255,7 +255,7 @@ public class UnboundedInt implements Cloneable {
 	 *   Indicates the element is negative or greater than three integers long.
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory for new UnboundedInt.
-	 * @exception RunTimeError
+	 * @exception RunTimeException
 	 *   May occur if element contains leading zeros. 
 	 * @note
 	 *   If element contains leading zeros and there is no compilation or runtime error, then the 
@@ -296,7 +296,7 @@ public class UnboundedInt implements Cloneable {
 	///// Arithmetic Operators /////
 	/**
 	 * A method to add one unboundedInt to another UnboundedInt and return their sum.
-	 * @param - addendInt
+	 * @param addendInt
 	 *   The UnboundedInt to be added to the invoked UnboundedInt.
 	 * @precondition
 	 *   The invoked UnboundedInt and the addendInt may be any size or empty. 
@@ -410,7 +410,7 @@ public class UnboundedInt implements Cloneable {
 	
 	/**
 	 * A method to multiply one unboundedInt by another UnboundedInt and return their product.  
-	 * @param - multiplierInt
+	 * @param multiplierInt
 	 *   The UnboundedInt to multiply the invoked UnboundedInt by.
 	 * @precondition
 	 *   Neither the invoked UnboundedInt or multiplierInt may be empty.
@@ -423,6 +423,16 @@ public class UnboundedInt implements Cloneable {
 	 **/ 
 	public UnboundedInt multiply(UnboundedInt multiplierInt)
 	{
+		//Product to be returned
+		UnboundedInt total = new UnboundedInt();
+		
+		//Handle multiplication by zero separately for output formatting purposes and efficiency
+		UnboundedInt zero = new UnboundedInt(0);
+		if (this.equals(zero) || multiplierInt.equals(zero)){
+			total.addFront(0);
+			return total;
+		}
+		
 		//check that both numbers are not empty
 		if (this.nodeCount != 0 && multiplierInt.nodeCount!= 0){
 			//make a variable to hold the carryover
@@ -430,7 +440,6 @@ public class UnboundedInt implements Cloneable {
 			//make a variable to keep track of zeros
 			int zeroCount = 0;
 			
-			UnboundedInt total = new UnboundedInt();
 			total.addEnd(0);
 			
 			int currentProduct;
@@ -485,7 +494,7 @@ public class UnboundedInt implements Cloneable {
 	///// Overridden and Static Methods /////
 	/**
 	 * A method to generate an independent copy (clone) of this UnboundedInt.  
-	 * @param - none
+	 * @param none
 	 * @return
 	 *   The return value is an independent copy (clone) of this UnboundedInt.
 	 *   The copy's currently selected element is the element containing the ones place.
@@ -522,7 +531,7 @@ public class UnboundedInt implements Cloneable {
 	
 	/**
 	 * A method to compare two UnboundedInt objects and determine if they are equivalent.  
-	 * @param - obj
+	 * @param obj
 	 *   The UnboundedInt that is being compared to the current UnboundedInt.
 	 * @postcondition
 	 *   If the UnboundedInt's being compared are equivalent, then equals will return true. 
@@ -560,7 +569,7 @@ public class UnboundedInt implements Cloneable {
 	
 	/**
 	 * Method Description  
-	 * @param - none
+	 * @param none
 	 * @precondition
 	 *   This UnboundedInt is not empty.
 	 * @return
