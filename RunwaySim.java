@@ -1,7 +1,8 @@
 
 import java.util.*; //Required for Scanner class
 
-public class RunwaySimulation {
+public class RunwaySim
+{
 
 	public static void main(String[] args)
 	{
