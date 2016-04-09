@@ -45,31 +45,41 @@ class RunwaySimulation
 	 **/
 	public static void main(String[] args)
 	{
-		int totalMin;
-		int takeOffTime;
-		int landingTime;
-		int takeOffProb;
-		int landingProb;
-		int crashThreshold;
+		//Declare the time variables required for the simulatePlanes() method's arguments (all times in minutes)
+		int simulationLength; //The total amount of time to run the simulation
+		int takeOffTime; //The amount of runway time required for each Plane to take-off
+		int landingTime; //The amount of runway time required for each Plane to land
+		int crashThreshold; //The maximum amount of time a Plane can wait in the landing queue before crashing
+		int avgDepartureTime; //The average number of minutes between new departing Planes requesting take-off
+		int avgArrivalTime; //The average number of minutes between new arriving Planes requesting landing
 		
+		//Initialize the Scanner for user input
 		Scanner keyboard = new Scanner(System.in);
 		
-		//ask user then run method to simulate planes
-		System.out.println("Hello, this is a program to simulate planes taking off and landing on a runway.");
-		System.out.println("Please enter the number of minutes you would like to run this simulation for.");
-		totalMin = acceptInput(keyboard);
-		System.out.println("Please enter the number of minutes a plane will take to take off.");
-		takeOffTime = acceptInput(keyboard);
-		System.out.println("Please enter the number of minutes a plane will take to land.");
-		landingTime = acceptInput(keyboard);
-		System.out.println("Please enter the average number of minutes that a plane will arrive for taking off.");
-		takeOffProb = acceptInput(keyboard);
-		System.out.println("Please enter the average number of minutes that a plane will arrive for landing.");
-		landingProb = acceptInput(keyboard);
-		System.out.println("Please enter the number of minutes before a plane waiting to land will crash.");
-		crashThreshold = acceptInput(keyboard);
+		//Obtain variable values from the user and initialize the variables
+		System.out.println("\n********************************************************");
+		System.out.println("<<<<<<<<<<<<<<   RUNWAY SIMULATOR SETUP   >>>>>>>>>>>>>>");
+		System.out.println("********************************************************");
+		System.out.println("\nRunway Simulation is ready for starting parameters.");
+		System.out.println("Please enter all times in minutes.\n");
+		System.out.print("   Please enter the total time to run this simulation: ");
+			simulationLength = acceptInput(keyboard);
+		System.out.print("   Please enter the amount of runway time required for a plane to takeoff: ");
+			takeOffTime = acceptInput(keyboard);
+		System.out.print("   Please enter the amount of runway time required for a plane to land: ");
+			landingTime = acceptInput(keyboard);
+		System.out.print("   Please enter the maximum amount of time a plane can wait to begin landing before crashing: ");
+			crashThreshold = acceptInput(keyboard);	
+		System.out.print("   Please enter the average number of minutes between new departing planes waiting for takeoff: ");
+			avgDepartureTime = acceptInput(keyboard);
+		System.out.print("   Please enter the average number of minutes between new arriving planes waiting for landing: ");
+			avgArrivalTime = acceptInput(keyboard);
+		System.out.println("\n*********************************************************");
+		System.out.println("<<<<<<<<<<<<<<   BEGIN RUNWAY SIMULATION   >>>>>>>>>>>>>>");
+		System.out.println("*********************************************************");
 		
-		simulatePlanes(totalMin,takeOffTime,landingTime,takeOffProb,landingProb,crashThreshold);
+		//Run the simulation with the values input by the user
+		simulatePlanes(simulationLength, takeOffTime, landingTime, crashThreshold, avgDepartureTime, avgArrivalTime);
 		
 	}//End Main Method
 	
@@ -87,80 +97,85 @@ class RunwaySimulation
 	 * @note
 	 *   
 	 **/
-	private static void simulatePlanes (int totalTime, int takeOffTime, int landingTime, double probTakeOff, double probLanding, int minBefCrash)
+	private static void simulatePlanes(int simulationLength, int takeOffTime, int landingTime, int crashThreshold, double avgDepartureTime, double avgArrivalTime)
 	{
-		LinkedQueue <Plane> takeOffList = new LinkedQueue<Plane>();
-		LinkedQueue <Plane> landingList = new LinkedQueue<Plane>();
-		LinkedStack <Plane> crashedList = new LinkedStack<Plane>();
-		
-		Plane currPlane = null;
-		
-		BooleanSource planeProbT = new BooleanSource((1/probTakeOff));
-		BooleanSource planeProbL = new BooleanSource(1/probLanding);
+		//Initialize the Runway and Plane cursor
 		Runway mainRunway = new Runway(takeOffTime, landingTime);
-		mainRunway.startUsingRunway('I');
+			mainRunway.startUsingRunway('I');
+		Plane currentPlane = null;
 		
-		int planesTakenOff = 0;
-		int planesLanded = 0;
+		//Initialize the Landing and Take-Off queues, and the Crashed Planes stack
+		LinkedQueue <Plane> takeOffQueue = new LinkedQueue<Plane>();
+		LinkedQueue <Plane> landingQueue = new LinkedQueue<Plane>();
+		LinkedStack <Plane> crashStack = new LinkedStack<Plane>();
 		
-		double timeWaitedTakeOff = 0;
-		double timeWaitedLanding = 0;
+		//Initialize the pseudorandom factors for Plane generation
+		BooleanSource takeOffProb = new BooleanSource((1/avgDepartureTime));
+		BooleanSource landingProb = new BooleanSource(1/avgArrivalTime);
 		
-		for (int i = 1; i < totalTime+1; i++){
-			System.out.println ("During minute " + i + ":");
+		//Initialize trackers for simulation metrics
+		int simulationMinute; //The current minute in the simulation
+		int planesTakenOff = 0; //The total number of Planes to complete take-off during the simulation
+		int planesLanded = 0; //The total number of Planes to complete landing during the simulation
+		double timeWaitedTakeOff = 0; //The total number of minutes that Planes which complete take-off during the simulation waited in the take-off queue
+		double timeWaitedLanding = 0; //The total number of minutes that Planes which complete landing during the simulation waited in the landing queue
+		
+		//Run through the simulation one minute at a time and output a minute-by-minute playback
+		for (simulationMinute = 1; simulationMinute <= simulationLength; simulationMinute++){
 			
-			//calc probability of planes and add them
-			addPlanes(landingList, takeOffList, planeProbT, planeProbL, i);
+			//Begin minute-by-minute playback output
+			System.out.println ("\nSimulation Minute " + simulationMinute + ":");
 			
-			//should planes taken off/landed be counted here or when they finish taking off?
-			//same with total time
-			//check if runway busy if not then process a plane
+			//Pseudorandomly generate new Planes and output new landing or take-off requests
+			addPlanes(takeOffQueue, landingQueue, takeOffProb, landingProb, simulationMinute);
+			
+			//Check if the Runway is busy and process a Plane if it is not busy
 			if (!mainRunway.isBusy()){
-				//get the next plane
-				currPlane = getNextPlane(landingList, takeOffList, crashedList, minBefCrash, i);
-				//start off an operation if the plane wasn't null
-				//if there are no planes, the runway is idle
-				if (currPlane!=null){
-					mainRunway.startUsingRunway(currPlane.getOperation());
+				//Get the next Plane
+				currentPlane = getNextPlane(takeOffQueue, landingQueue, crashStack, crashThreshold, simulationMinute);
+				//Begin a Runway operation if there is a next Plane
+				if (currentPlane!=null){
+					mainRunway.startUsingRunway(currentPlane.getOperation());
 				}
-				//idle case
+				//If there is no next Plane, then the Runway is idle, output the Runway status
 				else {
-					System.out.println("Runway: " + mainRunway.getOperationStatement());
+					System.out.println("   Runway Status: " + mainRunway.getOperationStatement());
 				}
 			}//end if
 			
-			//if a plane is currently being processed
-			if (currPlane!=null){
+			//If a plane is currently performing an operation with the Runway, then output the Runway status
+			if (currentPlane!=null){
 				if (mainRunway.getTimeLeft() > 1){
-					System.out.println("Plane #" + currPlane.getPlaneNo() + " is " + mainRunway.getOperationStatement());
+					System.out.println("   Runway Status: Plane #" + currentPlane.getPlaneNo() + " is " + mainRunway.getOperationStatement());
 					mainRunway.reduceRemainingTime();
 				}
-				//plane is finishing so prepare to set runway back to idle and say that its finishing
+				//If a plane is currently finishing an operation with the Runway, then output the Runway status, update simulation metrics
 				else {
-					System.out.println("Plane #" + currPlane.getPlaneNo() + " is finishing " +  mainRunway.getOperationStatement() + ".");
-					if (currPlane.getOperation() == 'L'){
+					System.out.println("   Runway Status: Plane #" + currentPlane.getPlaneNo() + " is finishing " +  mainRunway.getOperationStatement());
+					if (currentPlane.getOperation() == 'L'){
 						planesLanded++;
-						timeWaitedLanding += (i-currPlane.getTime());
+						timeWaitedLanding += (simulationMinute-(landingTime-1)-currentPlane.getTime());
 					}
-					else if (currPlane.getOperation() == 'T'){
+					else if (currentPlane.getOperation() == 'T'){
 						planesTakenOff++;
-						timeWaitedTakeOff += (i-currPlane.getTime());
+						timeWaitedTakeOff += (simulationMinute-(takeOffTime-1)-currentPlane.getTime());
 					}
+					//Prepare the Runway to be idle if there are no Planes to use it in the next simulation minute
 					mainRunway.startUsingRunway('I');
-				}
-			}
+				}//end else
+			}//end if
 		}//end of for
 		
-		//run this again to sort through the landing list for any other crashes
-		getNextPlane(landingList, takeOffList, crashedList, minBefCrash, totalTime);
+		//Run this again to sort through the landing list for any additional crashes during the simulation
+		getNextPlane(takeOffQueue, landingQueue, crashStack, crashThreshold, simulationLength);
 		
-		//report the info
-		reportInfo(planesTakenOff, planesLanded, timeWaitedTakeOff, timeWaitedLanding, crashedList.size());
+		//Report the simulation summary metrics to the user
+		reportInfo(planesTakenOff, planesLanded, crashStack.size(), timeWaitedTakeOff, timeWaitedLanding);
 		
-		//report the crashed planes
-		reportCrashed(crashedList, minBefCrash);
+		//List the crashed Planes to the user
+		reportCrashed(crashStack, crashThreshold);
 		
-	}//End simulatePlanes (int totalTime, int takeOffTime, int landingTime, double probTakeOff, double probLanding, int minBefCrash) Method
+	}//End simulatePlanes(int simulationLength, int takeOffTime, int landingTime, int crashThreshold, double avgDepartureTime, double avgArrivalTime) Method
 	
 	
 	/**
@@ -176,19 +191,20 @@ class RunwaySimulation
 	 * @note
 	 *   
 	 **/
-	private static void addPlanes(LinkedQueue landingL, LinkedQueue takeoffL, BooleanSource planeProbT, BooleanSource planeProbL, int minute)
+	private static void addPlanes(LinkedQueue<Plane> takeOffQueue, LinkedQueue<Plane> landingQueue, BooleanSource takeOffProb, BooleanSource landingProb, int minute)
 	{
-		if (planeProbT.query()){
-			Plane nextPlane = new Plane(minute,'T');
-			takeoffL.add(nextPlane);
-			System.out.println("Arrived for takeoff: Plane No." + nextPlane.getPlaneNo());
+		//Pseudorandomly generate new Planes and output new landing or take-off requests
+		if (takeOffProb.query()){
+			Plane newPlane = new Plane(minute,'T');
+			takeOffQueue.add(newPlane);
+			System.out.println("   New Take-off Request: Plane #" + newPlane.getPlaneNo());
 		}
-		if (planeProbL.query()){
-			Plane nextPlane = new Plane(minute,'L');
-			landingL.add(nextPlane);
-			System.out.println("Arrived for landing: Plane No." + nextPlane.getPlaneNo());
+		if (landingProb.query()){
+			Plane newPlane = new Plane(minute,'L');
+			landingQueue.add(newPlane);
+			System.out.println("   New Landing Request: Plane #" + newPlane.getPlaneNo());
 		}
-	}//End addPlanes(LinkedQueue landingL, LinkedQueue takeoffL, BooleanSource planeProbT, BooleanSource planeProbL, int minute) Method
+	}//End addPlanes(LinkedQueue<Plane> takeOffQueue, LinkedQueue<Plane> landingQueue, BooleanSource takeOffProb, BooleanSource landingProb, int minute) Method
 	
 	
 	/**
@@ -207,39 +223,41 @@ class RunwaySimulation
 	 * @note
 	 *   
 	 **/
-	private static Plane getNextPlane(LinkedQueue <Plane> landingList, LinkedQueue <Plane> takeOffList, LinkedStack<Plane> crashedList, int crashThreshold, int minute)
+	private static Plane getNextPlane(LinkedQueue<Plane> takeOffQueue, LinkedQueue<Plane> landingQueue, LinkedStack<Plane> crashStack, int crashThreshold, int minute)
 	{
-		//first set the plane to the first plane in queue
-		Plane validPlane = null;
-		boolean isCrashable = true;
+		//Initialize a Plane cursor and crash test variable
+		Plane nextPlane = null;
+		boolean hasCrashed = true;
 		
-		if (!landingList.isEmpty()){
-			validPlane = landingList.remove();
-			
-			//break out of loop if validPlane is from takeOffList
-			while (validPlane!=null && isCrashable && minute - validPlane.getTime() >= crashThreshold){
-				crashedList.push(validPlane);
-				//move to next plane if there is no plane set to null
-				if (!landingList.isEmpty()){
-					validPlane = landingList.remove();
+		//Check the landing queue for Planes waiting to land
+		if (!landingQueue.isEmpty()){
+			nextPlane = landingQueue.remove();
+			//Test if the next Plane in the landing queue has crashed, repeat until a Plane can land or the landing queue is empty
+			while (nextPlane!=null && hasCrashed && (minute - nextPlane.getTime()) >= crashThreshold){
+				crashStack.push(nextPlane);
+				//If the previous plane waiting to land crashed, then check the landing queue for the next Plane waiting to land
+				if (!landingQueue.isEmpty()){
+					nextPlane = landingQueue.remove();
 				}
-				//if the list was empty after taking the first plane, then move to takeoffList
-				else if (!takeOffList.isEmpty()){
-					validPlane = takeOffList.remove();
-					isCrashable = false;
+				//If the landing queue is now empty, then check the take-off queue for Planes waiting to take-off
+				else if (!takeOffQueue.isEmpty()){
+					nextPlane = takeOffQueue.remove();
+					hasCrashed = false;
 				}
 				else {
-					validPlane = null;
+					nextPlane = null;
 				}
 			}//end while
 		}//end if
-		else if (!takeOffList.isEmpty()){
-			validPlane = takeOffList.remove();
+		//If the landing queue was empty, then check the take-off queue for Planes waiting to take-off
+		else if (!takeOffQueue.isEmpty()){
+			nextPlane = takeOffQueue.remove();
 		}
 		
-		return validPlane;
+		//Return the next Plane to use the Runway
+		return nextPlane;
 		
-	}//End getNextPlane(LinkedQueue <Plane> landingList, LinkedQueue <Plane> takeOffList, LinkedStack<Plane> crashedList, int crashThreshold, int minute) Method
+	}//End getNextPlane(LinkedQueue <Plane> takeOffQueue, LinkedQueue <Plane> landingQueue, LinkedStack<Plane> crashStack, int crashThreshold, int minute) Method
 	
 	
 	/**
@@ -255,34 +273,39 @@ class RunwaySimulation
 	 * @note
 	 *   
 	 **/
-	private static void reportInfo(int takeOffPlane, int landedPlane, double takeOffTotal, double landingTotal, int planesCrashed)
+	private static void reportInfo(int planesTakenOff, int planesLanded, int planesCrashed, double timeWaitedTakeOff, double timeWaitedLanding)
 	{
+		//Initialize the formatting tool for double numbers
 		DecimalFormat precision = new DecimalFormat("0.00");
 		
+		//Initialize the average landing time and take-off time metrics
 		double aveTimeTakeOff = 0;
 		double aveTimeLanding = 0;
 		
-		System.out.println("The number of planes landed is: " + landedPlane);
-		System.out.println("The number of planes taken off is: " + takeOffPlane);
-		
-		if (takeOffPlane > 0){
-			aveTimeTakeOff = takeOffTotal/takeOffPlane;
-			System.out.println("The average time waited for takeoff is: " + precision.format(aveTimeTakeOff));
+		//Output Runway simulation metrics
+		System.out.println("\n*******************************************************");
+		System.out.println("<<<<<<<<<<<<   RUNWAY SIMULATION SUMMARY   >>>>>>>>>>>>");
+		System.out.println("*******************************************************\n");
+		System.out.println("   Number of departing planes that completed takeoff: " + planesTakenOff);
+		System.out.println("   Number of arriving planes that completed landing: " + planesLanded);
+		if (planesTakenOff > 0){
+			aveTimeTakeOff = timeWaitedTakeOff/planesTakenOff;
+			System.out.println("   Average wait time (in minutes) to begin taking-off: " + precision.format(aveTimeTakeOff));
 		}
 		else {
-			System.out.println("No planes ever took off so an accurate average cannot be calculated.");
+			System.out.println("   Average wait time (in minutes) to begin taking-off: No planes took-off during this simulation");
 		}
-		if (landedPlane > 0)
+		if (planesLanded > 0)
 		{
-			aveTimeLanding = landingTotal/landedPlane;
-			System.out.println("The average time waited for landing is: " + precision.format(aveTimeLanding));
+			aveTimeLanding = timeWaitedLanding/planesLanded;
+			System.out.println("   Average wait time (in minutes) to begin landing: " + precision.format(aveTimeLanding));
 		}
 		else {
-			System.out.println("No planes ever landed so an accurate average cannot be calculated.");
+			System.out.println("   Average wait time (in minutes) to begin landing: No planes landed during this simulation");
 		}
+		System.out.println("   Number of planes that crashed waiting to land: " + planesCrashed);
 		
-		System.out.println("The number of planes crashed is: " + planesCrashed);
-	}//End private static void reportInfo(int takeOffPlane, int landedPlane, double takeOffTotal, double landingTotal, int planesCrashed) Method
+	}//End reportInfo(int planesTakenOff, int planesLanded, int planesCrashed, double timeWaitedTakeOff, double timeWaitedLanding) Method
 	
 	
 	/**
@@ -298,16 +321,18 @@ class RunwaySimulation
 	 * @note
 	 *   
 	 **/
-	private static void reportCrashed(LinkedStack <Plane> crashedList, int minBefCrash)
+	private static void reportCrashed(LinkedStack<Plane> crashedList, int crashThreshold)
 	{  
-		Plane currCrash;
+		//Initialize a Plane cursor
+		Plane currentCrash;
 		
+		//Output a list of crashed Planes
 		while (!crashedList.isEmpty()){
-			currCrash = crashedList.pop();
-			System.out.print("Plane #" + currCrash.getPlaneNo() + " crashed at minute: ");
-			System.out.println((currCrash.getTime()+minBefCrash));
+			currentCrash = crashedList.pop();
+			System.out.println("    > Plane #" + currentCrash.getPlaneNo() + " crashed at minute: " + (currentCrash.getTime()+crashThreshold));
 		}
-	}//End reportCrashed(LinkedStack <Plane> crashedList, int minBefCrash) Method
+		
+	}//End reportCrashed(LinkedStack<Plane> crashedList, int crashThreshold) Method
 	
 	
 	/**
@@ -327,23 +352,23 @@ class RunwaySimulation
 	 **/
 	private static int acceptInput(Scanner keyboard)
 	{
+		//Initialize an input variable
 		int input = 0;
-		boolean notDone = true;
 		
-		while (notDone){
-			try {
-				input = keyboard.nextInt();
-				if (input < 1){
-					throw new IllegalArgumentException("Simulation input values must be whole number integers greater than zero!");
-				}
-				notDone = false;
-				System.out.println("Your input is: " + input);
-			}//end try
-			catch (Exception e){
+		//Throw an exception if the user enters a non-integer value, a number less than 1, or a letter
+		try {
+			input = keyboard.nextInt();
+			if (input < 1){
 				throw new IllegalArgumentException("Simulation input values must be whole number integers greater than zero!");
-			}
-		}//end while
+			}	
+		}//end try
+		catch (Exception e){
+				throw new IllegalArgumentException("Simulation input values must be whole number integers greater than zero!");
+		}
+		
+		//Return the user's input
 		return input;
+		
 	}//End acceptInput(Scanner keyboard) Method
 	
 }//End RunwaySimulation Class
