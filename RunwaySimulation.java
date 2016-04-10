@@ -4,26 +4,24 @@
 // Authors: Carmen Chiu and Rafael Ferrer
 // Due Date: Monday 4/11/16
 
-/*****************************************************************************************************************  
-* An UnboundedInt is a positive whole number, base 10 integer, of arbitrary length. The UnboundedInt class allows 
-* for the creation of unbounded integers and provides methods for performing basic arithmetic operations with
-* UnboundedInt's (addition and multiplication).
+/********************************************************************************************************************  
+* The RunwaySimulation class is used in conjunction with the Runway class and the Plane class to simulate planes 
+* taking off and landing on a runway. The RunwaySimulation class performs the airport runway simulation by creating 
+* a number of pseudorandomly generated Planes and processing them through a single Runway.
 *
 * @note
-* 	(1) An UnboundedInt can be increased indefinitely after it's created, but the maximum size is limited 
-*   by the amount of free memory on the machine. The UnboundedInt(int... elements), addFront(int element), 
-*   addEnd(int element), add(UnboundedInt addendInt), multiply(UnboundedInt multiplierInt), and clone() 
-*   methods will result in an OutOfMemoryError when free memory is exhausted.
+* 	(1) RunwaySimulation accepts simulation parameters from the user once at the beginning of the simulation and then
+* 		runs the simulation based on those parameters.
 *   <p>
-*   (2) The elements of an UnboundedInt are stored in a sequence in increasing order from the element containing 
-*   the ones place to the element containing the highest multiple of ten.
+*   (2) RunwaySimulation gives priority runway use to PLanes requesting landing in order to prevent Planes from
+*   	running out of fuel and crashing while waiting to land. 
 *   <p>
-*   (3) Each element of an UnboundedInt contains a positive one, two, or three digit integer that represents
-*   three placeholders of UnboundedInt.
+*   (3) RunwaySimulation Outputs a minute-by-minute playback of the simulation's status, as well as a summary of the 
+*   	simulation's events.
 *
 * @version
-*   March 20, 2016
-*****************************************************************************************************************/
+*   April 10, 2016
+********************************************************************************************************************/
 
 import java.util.*;//need for user input and exceptions
 import java.text.DecimalFormat;//need for formatting average
@@ -31,17 +29,25 @@ import java.text.DecimalFormat;//need for formatting average
 class RunwaySimulation
 {
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 * The main method that obtains the simulation's starting parameters from the user and then initiates the runway simulation.
+	 * @postcondition
+	 *   The runway simulation has been initiated. 
 	 * @note
-	 *   
+	 *   Starting Parameters for a Runway Simulation:
+	 *    <p>
+	 *    All times must be entered in integer minutes greater than zero. 
+	 *    <p>
+	 *    1) The simulations length in minutes
+	 *    <p>
+	 *    2) The amount of runway time required for a plane to take-off
+	 *    <p>
+	 *    3) The amount of runway time required for a plane land
+	 *    <p>
+	 *    4) The amount of time a plane can wait to begin landing before crashing
+	 *    <p>
+	 *    5) The average number of minutes between new departing planes requesting take-off
+	 *    <p>
+	 *    6) The average number of minutes between new arriving planes requesting landing
 	 **/
 	public static void main(String[] args)
 	{
@@ -64,15 +70,15 @@ class RunwaySimulation
 		System.out.println("Please enter all times in minutes.\n");
 		System.out.print("   Please enter the total time to run this simulation: ");
 			simulationLength = acceptInput(keyboard);
-		System.out.print("   Please enter the amount of runway time required for a plane to takeoff: ");
+		System.out.print("   Please enter the amount of runway time required for a plane to take-off: ");
 			takeOffTime = acceptInput(keyboard);
 		System.out.print("   Please enter the amount of runway time required for a plane to land: ");
 			landingTime = acceptInput(keyboard);
 		System.out.print("   Please enter the maximum amount of time a plane can wait to begin landing before crashing: ");
 			crashThreshold = acceptInput(keyboard);	
-		System.out.print("   Please enter the average number of minutes between new departing planes waiting for takeoff: ");
+		System.out.print("   Please enter the average number of minutes between new departing planes requesting take-off: ");
 			avgDepartureTime = acceptInput(keyboard);
-		System.out.print("   Please enter the average number of minutes between new arriving planes waiting for landing: ");
+		System.out.print("   Please enter the average number of minutes between new arriving planes requesting landing: ");
 			avgArrivalTime = acceptInput(keyboard);
 		System.out.println("\n*********************************************************");
 		System.out.println("<<<<<<<<<<<<<<   BEGIN RUNWAY SIMULATION   >>>>>>>>>>>>>>");
@@ -85,17 +91,28 @@ class RunwaySimulation
 	
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * This method runs the runway simulation one minute at a time. Each minute a new Plane may be pseudorandomly generated, the runway's current use 
+	 * is managed, queues of Planes waiting to use the Runway are managed, the simulation metrics are tracked, and a minute-by-minute report of the 
+	 * simulation's status is output. A simulation summary is also output at the end.
+	 * @param simulationLength
+	 *   The total amount of time to run the simulation (in minutes).
+	 * @param takeOffTime
+	 *   The amount of runway time required for each Plane to take-off (in minutes).
+	 * @param landingTime
+	 *   The amount of runway time required for each Plane to land (in minutes).
+	 * @param crashThreshold
+	 *   The maximum amount of time a Plane can wait to land before crashing (in minutes).
+	 * @param avgDepartureTime
+	 *   The average number of minutes between new departing Planes requesting take-off.
+	 * @param avgArrivalTime
+	 *   The average number of minutes between new arriving Planes requesting landing.
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The arguments passed for simulationLength, takeOffTime, landingTime, and crashThreshold must all be integer values greater than zero.
+	 *   The arguments passed for avgDepartureTime and avgArrivalTime must both be double values greater than zero.
+	 * @postcondition
+	 *   The runway simulation has completed and a simulation summary and minute-by-minute playback have been output.
 	 * @note
-	 *   
+	 *   Priority runway use is given to Planes requesting landing in order to prevent Planes from running out of fuel and crashing while waiting to land.
 	 **/
 	private static void simulatePlanes(int simulationLength, int takeOffTime, int landingTime, int crashThreshold, double avgDepartureTime, double avgArrivalTime)
 	{
@@ -117,7 +134,7 @@ class RunwaySimulation
 		int simulationMinute; //The current minute in the simulation
 		int planesTakenOff = 0; //The total number of Planes to complete take-off during the simulation
 		int planesLanded = 0; //The total number of Planes to complete landing during the simulation
-		double timeWaitedTakeOff = 0; //The total number of minutes that Planes which complete take-off during the simulation waited in the take-off queue
+		double timeWaitedTakeOff = 0; //The total number of minutes that Planes which completed take-off during the simulation waited in the take-off queue
 		double timeWaitedLanding = 0; //The total number of minutes that Planes which complete landing during the simulation waited in the landing queue
 		
 		//Run through the simulation one minute at a time and output a minute-by-minute playback
@@ -179,17 +196,24 @@ class RunwaySimulation
 	
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * This method pseudorandomly generates planes that are either requesting take-off or landing.
+	 * @param takeOffQueue
+	 *   Queue of Planes waiting to use the Runway for take-off.
+	 * @param landingQueue
+	 *   Queue of Planes waiting to use the Runway for landing.
+	 * @param takeOffProb
+	 *   The probability that a new Plane will request take-off at any given minute.
+	 * @param landingProb
+	 *   The probability that a new Plane will request landing at any given minute.
+	 * @param minute
+	 *   The current minute of the simulation. 
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The arguments passed for takeOffProb and landingProb must be between zero and one.
+	 *   The argument passed for minute must be an integer greater than zero.
+	 * @postcondition
+	 *   A new Plane may have been added to the take-off or landing queues.
 	 * @note
-	 *   
+	 *   The probability of new planes requesting landing or take-off is calculated by the simulatePlanes() method, using the average times provided by the main method.
 	 **/
 	private static void addPlanes(LinkedQueue<Plane> takeOffQueue, LinkedQueue<Plane> landingQueue, BooleanSource takeOffProb, BooleanSource landingProb, int minute)
 	{
@@ -204,24 +228,28 @@ class RunwaySimulation
 			landingQueue.add(newPlane);
 			System.out.println("   New Landing Request: Plane #" + newPlane.getPlaneNo());
 		}
+		
 	}//End addPlanes(LinkedQueue<Plane> takeOffQueue, LinkedQueue<Plane> landingQueue, BooleanSource takeOffProb, BooleanSource landingProb, int minute) Method
 	
 	
 	/**
-	 * Description
-	 * clears any crashed planes and gives the next valid plane in queue
-	 * since we assume only one plane appears per minute and this method would be run at least
-	 * every few minutes that 
-	 * @param
-	 *   
+	 * This method manages the landing queue, take-off queue, and any Planes that may have crashed waiting to land. 
+	 * It tracks and clears any crashed planes from the landing queue and returns the next Plane (uncrashed) in 
+	 * either queue when it is their turn to use the Runway.
+	 * @param takeOffQueue
+	 *   Queue of Planes waiting to use the Runway for take-off.
+	 * @param landingQueue
+	 *   Queue of Planes waiting to use the Runway for landing.
+	 * @param crashStack
+	 *   Stack that will store any Planes that crashed waiting to land.
+	 * @param crashThreshold
+	 *   The maximum amount of time a Plane can wait to land before crashing (in minutes).
+	 * @param minute
+	 *   The current minute of the simulation.
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 *   The arguments passed for crashThreshold and minute must be integers greater than zero. 
+	 * @return
+	 *   A Plane that will use the Runway to either land or take-off.
 	 **/
 	private static Plane getNextPlane(LinkedQueue<Plane> takeOffQueue, LinkedQueue<Plane> landingQueue, LinkedStack<Plane> crashStack, int crashThreshold, int minute)
 	{
@@ -261,17 +289,22 @@ class RunwaySimulation
 	
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * This method calculates and reports a summary of the simulation based on metrics recorded by the simulatePlanes() method.
+	 * @param planesTakenOff
+	 *   The total number of Planes that completed take-off during the simulation.
+	 * @param planesLanded
+	 *   The total number of Planes that completed landing during the simulation.
+	 * @param planesCrashed
+	 *   The total number of Planes that crashed waiting to land.
+	 * @param timeWaitedTakeOff
+	 *   The total number of minutes that Planes which completed take-off during the simulation waited in the take-off queue.
+	 * @param timeWaitedLanding
+	 *   The total number of minutes that Planes which completed landing during the simulation waited in the landing queue.
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 *   The arguments passed for planesTakenOff, planesLanded, and planesCrashed must be integers greater than zero.
+	 *   The arguments passed for timeWaitedTakeOff and timeWaitedLanding must be doubles greater than zero.
+	 * @postcondition
+	 *   A summary of the runway simulation has been output.
 	 **/
 	private static void reportInfo(int planesTakenOff, int planesLanded, int planesCrashed, double timeWaitedTakeOff, double timeWaitedLanding)
 	{
@@ -293,7 +326,7 @@ class RunwaySimulation
 			System.out.println("   Average wait time (in minutes) to begin taking-off: " + precision.format(aveTimeTakeOff));
 		}
 		else {
-			System.out.println("   Average wait time (in minutes) to begin taking-off: No planes took-off during this simulation");
+			System.out.println("   Average wait time (in minutes) to begin taking-off: No planes completed take-off during this simulation");
 		}
 		if (planesLanded > 0)
 		{
@@ -301,7 +334,7 @@ class RunwaySimulation
 			System.out.println("   Average wait time (in minutes) to begin landing: " + precision.format(aveTimeLanding));
 		}
 		else {
-			System.out.println("   Average wait time (in minutes) to begin landing: No planes landed during this simulation");
+			System.out.println("   Average wait time (in minutes) to begin landing: No planes completed landing during this simulation");
 		}
 		System.out.println("   Number of planes that crashed waiting to land: " + planesCrashed);
 		
@@ -309,26 +342,26 @@ class RunwaySimulation
 	
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * This method reports the details of each plane crash that occurred during the simulation.
+	 * @param crashStack
+	 *   Stack that stores any Planes that crashed waiting to land.
+	 * @param crashThreshold
+	 *   The maximum amount of time a Plane can wait to land before crashing (in minutes).
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The argument passed for crashThreshold must be an integer greater than zero.
+	 * @postcondition
+	 *   A list of Planes that crashed have been output, along with the simulation minute of each crash.
 	 * @note
-	 *   
+	 *   The list of Planes that crashed will be output in order of most recent crash.
 	 **/
-	private static void reportCrashed(LinkedStack<Plane> crashedList, int crashThreshold)
+	private static void reportCrashed(LinkedStack<Plane> crashStack, int crashThreshold)
 	{  
 		//Initialize a Plane cursor
 		Plane currentCrash;
 		
 		//Output a list of crashed Planes
-		while (!crashedList.isEmpty()){
-			currentCrash = crashedList.pop();
+		while (!crashStack.isEmpty()){
+			currentCrash = crashStack.pop();
 			System.out.println("    > Plane #" + currentCrash.getPlaneNo() + " crashed at minute: " + (currentCrash.getTime()+crashThreshold));
 		}
 		
@@ -336,19 +369,17 @@ class RunwaySimulation
 	
 	
 	/**
-	 * Description
-	 * this method returns an integer input
-	 * need to check this method to make sure it works properly
-	 * @param
-	 *   
+	 * This method accepts user input in integers and catches any illegal arguments.
+	 * @param keyboard
+	 *   The Scanner being used to read user input.
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The user input being read by keyboard must be an integer greater than zero.
+	 * @return
+	 *   The integer read by keyboard and input by the user.
+	 * @exception IllegalArgumentException
+	 *   Will occur if the user input being read is not an integer greater than zero.
 	 * @note
-	 *   
+	 *   This method is used in the main() method to ensure that all simulation parameters entered by the user are legal.
 	 **/
 	private static int acceptInput(Scanner keyboard)
 	{
@@ -359,11 +390,11 @@ class RunwaySimulation
 		try {
 			input = keyboard.nextInt();
 			if (input < 1){
-				throw new IllegalArgumentException("Simulation input values must be whole number integers greater than zero!");
+				throw new IllegalArgumentException("Simulation input values must be integers greater than zero!");
 			}	
 		}//end try
 		catch (Exception e){
-				throw new IllegalArgumentException("Simulation input values must be whole number integers greater than zero!");
+				throw new IllegalArgumentException("Simulation input values must be integers greater than zero!");
 		}
 		
 		//Return the user's input
