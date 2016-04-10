@@ -1,193 +1,137 @@
 // File: Plane.java
 
 // Project #3: Chapter 7, project 9 - Airport Runway Simulation
-// Authors: Kevin Soule, Rafael Ferrer and Carmen Chiu
+// Authors: Kevin Soule, Rafael Ferrer, and Carmen Chiu
 // Due Date: Monday 4/11/16
 
-/*****************************************************************************************************************  
-* An UnboundedInt is a positive whole number, base 10 integer, of arbitrary length. The UnboundedInt class allows 
-* for the creation of unbounded integers and provides methods for performing basic arithmetic operations with
-* UnboundedInt's (addition and multiplication).
-*
+/*****************************************************************************************************************
+* The Plane class is used in conjunction with the Runway class and the RunwaySimulation class to simulate planes 
+* taking off and landing on a runway. Every Plane is assigned a unique plane number ID, a starting time, and a
+* flight operation it will perform.
+* 
 * @note
-* 	(1) An UnboundedInt can be increased indefinitely after it's created, but the maximum size is limited 
-*   by the amount of free memory on the machine. The UnboundedInt(int... elements), addFront(int element), 
-*   addEnd(int element), add(UnboundedInt addendInt), multiply(UnboundedInt multiplierInt), and clone() 
-*   methods will result in an OutOfMemoryError when free memory is exhausted.
+*   (1) A Plane can either be set to take-off or landing as its flight operation.
 *   <p>
-*   (2) The elements of an UnboundedInt are stored in a sequence in increasing order from the element containing 
-*   the ones place to the element containing the highest multiple of ten.
+*   (2) A Plane's number ID is dependent on the number of Planes that were created before it.
 *   <p>
-*   (3) Each element of an UnboundedInt contains a positive one, two, or three digit integer that represents
-*   three placeholders of UnboundedInt.
+*   (3) A Plane's starting time is dependent on the simulation minute when it was created. 
 *
 * @version
-*   March 20, 2016
+*   April 10, 2016
 *****************************************************************************************************************/
 
 class Plane
 {
 	// Invariant of the Plane class:
-			//   1. The number of three integer elements in the UnboundedInt is in the instance variable nodeCount.
-			//   2. The hundreds place in the UnboundedInt is in the instance variable head, which is also the first 
-			//      element of the linked list holding the elements of the UnboundedInt.
-			//   3. The highest power of ten in the UnboundedInt is in the instance variable tail, which is also the
-			//      last element of the linked list holding the elements of the UnboundedInt.
-			//   4. The instance variable current points to the currently selected element of the linked list. If there 
-			//      is no currently selected element, the cursor will be null and at the end of the linked list.
-			//   5. We care what is stored in every element that the head links to (directly or indirectly). We do not 
-			//      care about any elements that the head has no link to (directly or indirectly).
+	//   1. The planeCount is the number of planes that have been created so far.
+	//   2. The time is the minute a plane arrived at the runway in the simulation.
+	//   3. The flightOperation is the operation the plane should be doing. This can either be landing or taking off.
+	//   4. The planeNo is the Plane's unique ID number. This is based on the number of planes that have been created 
+	//      so far, signified by the static planeCount variable.
 	
 	
 	/// Private Instance Variables ///
 	
-	static private int planeCount = 0; //the plane number arrived to the queue should be in incrementing order
-	private int time; //the time the plane arrived in queue
-	private char flightOperation; //the kind of operation the plane is doing. 'L" is  for landing and 'T' is for taking off. 
-	private int planeNo; // plane number
+	static private int planeCount = 0;
+	private int time;
+	private char flightOperation;
+	private int planeNo;
 	
 	
 	/// Constructor ///
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * A constructor to create a new Plane object with a creation time, flight operation and unique plane number ID.
+	 * @param currentTime
+	 *   currentTime is the minute when the plane arrives in the queue.
+	 * @param landingOrTakeOff
+	 *   The character that represents the current flight operation the plane will perform.
+	 *   A Plane can land or take-off. 'L' for landing, 'T' for take-off.
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The argument passed for currentTime must be a positive integer. 
+	 *   The argument passed for landingOrTakeOff may not be any characters other than 'L' or 'T'.
+	 * @postcondition
+	 *   A new Plane object has been created and assigned a flight operation.
+	 * @exception IllegalArgumentException
+	 *   Will occur if the currentTime argument passed is not an integer greater than zero.
+	 *   Will occur if the landingOrTakeOff argument passed is not 'L' or 'T'.
 	 * @note
-	 *   
+	 *   The plane number ID is based on the static planeCount variable, so each Plane created will have a unique id.
 	 **/
 	public Plane(int currentTime, char landingOrTakeOff)
 	{	
-		time = currentTime;
-		flightOperation =  landingOrTakeOff;
-		planeNo = ++planeCount;
+		//Verify that the currentTime argument passed is a positive integer
+		if (currentTime < 1){
+			throw new IllegalArgumentException("The argument passed for currentTime must be an integer greater than zero!");
+		}
 		
-	}//end Plane(int aTime, char landingOrTakeOff) constructor
+		//Verify that the landingOrTakeOff argument passed is legal
+		if (landingOrTakeOff == 'L' || landingOrTakeOff == 'T'){
+			time = currentTime;
+			flightOperation =  landingOrTakeOff;
+			planeNo = ++planeCount;
+		}
+		else {
+			throw new IllegalArgumentException("Enter 'T' for take-off or 'L' for landing. No other arguments will be accepted for landingOrTakeOff!");
+		}
+		
+	}//End Plane(int currentTime, char landingOrTakeOff) constructor
 	
 	
 	/// Accessor Methods ///
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * An accessor method that returns the time at which the Plane arrived at the Runway.
+	 * @param none  
+	 * @return
+	 *    An integer value signifying the simulation minute when the Plane arrived at the Runway.
 	 **/
 	public int getTime()
 	{
 		return time;
 		
-	}//end getTime() method
+	}//End getTime() method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * An accessor method that returns the type of flight operation that a Plane needs to use the Runway for.
+	 * @param none
+	 * @return
+	 *   Returns a character that signifies the type of flight operation a Plane needs to use the Runway for. 
+	 *   Returns 'T' for take-off or 'L' for landing.
 	 **/
 	public char getOperation()
 	{
 		return flightOperation;
 		
-	}//end getOperation() method
+	}//End getOperation() method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 * An accessor method that returns the unique plane number ID of the invoked Plane.
+	 * @param none
+	 * @return
+	 *   Returns an integer value that contains the unique plane number ID of the invoked Plane.
 	 * @note
-	 *   
+	 *   The plane number ID is based on the static planeCount variable, so each Plane created will have a unique id.
 	 **/
 	public int getPlaneNo()
 	{
 		return planeNo;
 		
-	}//end getPlaneNo() method
-	
-	
-	/// Overridden Java Methods ///
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public Plane clone()
-	{
-		//Create a new Plane that will be returned as the clone of the invoked Plane. 
-		Plane answer;
-		
-		try{
-			//Clone the instance variables of the invoked Plane and assign them to the answer Plane.
-			answer = (Plane) super.clone( );
-		}
-		catch (CloneNotSupportedException e){
-			// This exception should not occur. But if it does, it would probably indicate a programming error that made super.clone unavailable.
-			// The most common error would be forgetting the "Implements Cloneable" clause at the start of this class.
-			throw new RuntimeException ("This class does not implement Cloneable");
-		}
-		catch (OutOfMemoryError e){
-			throw new OutOfMemoryError ("There is not enough memory available to clone this Plane!");
-		}
-		
-		return answer;
-		
-	}//end Plane clone() method
+	}//End getPlaneNo() method
 	
 	
 	/// Static Methods ///
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * A static accessor method that returns the number of Planes that have been created so far.
+	 * @param none
+	 * @return
+	 *   Returns an integer value signifying the number of Planes that have been created since beginning the simulation.  
 	 **/
 	private static int getPlaneCount()
 	{
 		return planeCount;
 		
-	}//end getPlaneCount() method
+	}//End getPlaneCount() method
 	
 }//End Plane Class
