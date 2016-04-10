@@ -25,7 +25,7 @@ class Plane
 	// Invariant of the Plane class:
 	//   1. The planeCount is the number of planes that have been created so far.
 	//   2. The time is the minute a plane arrived at the runway in the simulation.
-	//   3. The flightOperation is the operation the plane should be doing. This can either be landing or taking off.
+	//   3. The flightOperation is the operation the plane will perform. This can either be landing or taking off.
 	//   4. The planeNo is the Plane's unique ID number. This is based on the number of planes that have been created 
 	//      so far, signified by the static planeCount variable.
 	
