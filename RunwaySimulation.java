@@ -10,8 +10,8 @@
 * a number of pseudorandomly generated Planes and processing them through a single Runway.
 *
 * @note
-* 	(1) RunwaySimulation accepts simulation parameters from the user once at the beginning of the simulation and then
-* 		runs the simulation based on those parameters.
+*   (1) RunwaySimulation accepts simulation parameters from the user once at the beginning of the simulation and then
+* 	runs the simulation based on those parameters.
 *   <p>
 *   (2) RunwaySimulation gives priority runway use to PLanes requesting landing in order to prevent Planes from
 *   	running out of fuel and crashing while waiting to land. 
