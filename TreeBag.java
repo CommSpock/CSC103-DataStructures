@@ -1,6 +1,10 @@
-// File: TreeBag.java 
+// File: TreeBag.java
 // The implementation of most methods in this file is left as a student exercise from
 // Section 9.5 of "Data Structures and Other Objects Using Java"
+
+// Project #4: Golfer Scores Database using a Binary Search Tree
+// Authors: Rafael Ferrer and Carmen Chiu
+// Due Date: Monday 5/9/16
 
 /******************************************************************************************
 * This class is a homework assignment;
@@ -51,25 +55,25 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 **/
 	public E retrieve(E target)
 	{
-		// Student will replace this return statement with their own code:
-		return target;
+		BTNode<E> cursor = root;
+		
+		while (!(cursor.getData()).equals(target) && cursor != null){
+			if ((cursor.getData()).equals(target)){
+				return cursor.getData();
+			}
+			else {
+				if (target <= cursor.getData()){
+					cursor = cursor.getLeft();
+				}
+				else {
+					cursor = cursor.getRight();
+				}
+			}//end else
+		}//end while
+		
+		return null;
 		
 	}//End retrieve(E target) Method
-	
-	/**
-	 * Remove one copy of a specified element from this bag.
-	 * @param <CODE>target</CODE>
-	 *   The element to remove from the bag.
-	 * <dt><b>Postcondition:</b><dd>
-	 *   If <CODE>target</CODE> was found in the bag, then one copy of <CODE>target</CODE> has been removed and the method returns true.
-	 *   Otherwise the bag remains unchanged and the method returns false.
-	 **/
-	public boolean remove(E target)
-	{
-		// Student will replace this return statement with their own code:
-		return false;
-		
-	}//End remove(E target) Method
 	
 	/**
 	 * Accessor method to count the number of occurrences of a particular element in this bag.
@@ -80,8 +84,24 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 **/
 	public int countOccurrences(E target)
 	{
-		// Student will replace this return statement with their own code:
-		return 0;
+		int count = 0;
+		BTNode<E> cursor = root;
+		
+		while (cursor != null){
+			if ((cursor.getData()).equals(target)){
+				count++;
+			}
+			else {
+				if (target <= cursor.getData()){
+					cursor = cursor.getLeft();
+				}
+				else {
+					cursor = cursor.getRight();
+				}
+			}//end else
+		}//end while
+		
+		return count;
 		
 	}//End countOccurrences(E target) Method
 	
@@ -106,7 +126,7 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 **/
 	public void display()
 	{
-		// Student will replace this with their own code:
+		root.inorderPrint();
 		
 	}//End display() Method
 	
@@ -124,7 +144,25 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 **/
 	public void add(E element)
 	{      
-		// Implemented by student.
+		BTNode<E> cursor = root;
+		
+		//Search for the correct leaf to add this element to
+		while (!cursor.isLeaf()){
+			if (cursor.getData() <= element){
+				cursor = cursor.getLeft();
+			}
+			else {
+				cursor = cursor.getRight();
+			}
+		}//end while
+		
+		//Add the element to the correct side of the leaf
+		if (cursor.getData() <= element){
+			cursor.setLeft((BTNode<E>) element);
+		}
+		else {
+			cursor.setRight((BTNode<E>) element);
+		}
 		
 	}//End add(E element) Method
 	
@@ -146,6 +184,21 @@ public class TreeBag<E extends Comparable> implements Cloneable
 		// Implemented by student.
 		
 	}//End addAll(TreeBag<E> addend) Method
+	
+	/**
+	 * Remove one copy of a specified element from this bag.
+	 * @param <CODE>target</CODE>
+	 *   The element to remove from the bag.
+	 * <dt><b>Postcondition:</b><dd>
+	 *   If <CODE>target</CODE> was found in the bag, then one copy of <CODE>target</CODE> has been removed and the method returns true.
+	 *   Otherwise the bag remains unchanged and the method returns false.
+	 **/
+	public boolean remove(E target)
+	{
+		// Student will replace this return statement with their own code:
+		return false;
+		
+	}//End remove(E target) Method
 	
 	/**
 	 * Create a new bag that contains all the elements from two other bags.
@@ -170,7 +223,7 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	}//End union(TreeBag b1, TreeBag b2) Method
 	
 	
-	/// Static Methods ///
+	/// Cloneable Interface ///
 	
 	/**
 	 * Generate a copy of this bag.
