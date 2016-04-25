@@ -20,7 +20,7 @@
 *   April 23, 2016
 ******************************************************************************************/
 
-public class Golfer implements Comparable<String>
+public class Golfer implements Comparable<Golfer>
 {
 	// Invariant of the TreeBag class:
 	//   1. 
@@ -170,10 +170,10 @@ public class Golfer implements Comparable<String>
 	 * @note
 	 *   
 	 **/
-	//may have to import decimal formats for the score formatting
 	public String toString()
 	{
-		return "Name: " + lastName + "  Number of Rounds: " + numberOfRounds + "  Average Score: " + averageScore + "  Handicap: " + handicap;
+		//may have to import decimal formats for the score formatting
+		return "Golfer: " + lastName + "\n        Number of Rounds: " + numberOfRounds + "\n        Average Score: " + averageScore + "\n        Handicap: " + handicap;
 	}//End toString() Method
 	
 	
@@ -261,7 +261,7 @@ public class Golfer implements Comparable<String>
 	 **/
 	public void setHandicap(int inputHandicap)
 	{
-		if (inputHandicap >-1 && inputHandicap < 21){
+		if (inputHandicap >=0 && inputHandicap <= 20){
 			handicap = inputHandicap;
 		}
 		else {
@@ -285,7 +285,7 @@ public class Golfer implements Comparable<String>
 	 **/
 	public void addNewScore(double inputScore)
 	{
-		if (inputScore > -1){
+		if (inputScore >= 1){
 			numberOfRounds++;
 			averageScore = ((averageScore + inputScore)/2);
 		}
@@ -311,13 +311,14 @@ public class Golfer implements Comparable<String>
 	 * @note
 	 *   
 	 **/
-	public int compareTo(String inputName)
+	public int compareTo(Golfer inputGolfer)
 	{
 		int comparison;
 		
-		//negative if inputName precedes lastName in the alphabet
-		//positive if after
-		comparison = inputName.compareTo(lastName);
+		//Returns a negative integer if inputGolfer's last name precedes this Golfer's lastName alphabetically
+		//Returns a positive integer if inputGolfer's last name follows this Golfer's lastName alphabetically
+		//Returns zero if inputGolfer's last name is the same as this Golfer's lastName
+		comparison = lastName.compareTo(inputGolfer.getLastName());
 		
 		return comparison;
 		
