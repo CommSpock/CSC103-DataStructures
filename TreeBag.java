@@ -53,25 +53,30 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 *   If <CODE>target</CODE> was found in the bag, then method returns a reference to a comparable element.
 	 *   If the target was not found then the method returns null. The bag remains unchanged.
 	 **/
+	@SuppressWarnings("unchecked") //target.compareTo(cursor.getData())
 	public E retrieve(E target)
-	{
-		BTNode<E> cursor = root;
-		
-		while (!(cursor.getData()).equals(target) && cursor != null){
-			if ((cursor.getData()).equals(target)){
-				return cursor.getData();
-			}
-			else {
-				if (target <= cursor.getData()){
+	{		
+		if (root != null){
+			BTNode<E> cursor = root;
+			boolean done = false;
+			
+			while (cursor != null && !done){
+				if (target.compareTo(cursor.getData())<0){
 					cursor = cursor.getLeft();
 				}
-				else {
+				else if (target.compareTo(cursor.getData())>0){
 					cursor = cursor.getRight();
 				}
-			}//end else
-		}//end while
-		
-		return null;
+				else if (target.compareTo(cursor.getData())==0){
+					done = true;
+					return cursor.getData();
+				}
+			}//end while
+			return null;
+		}//end if
+		else {
+			return null;
+		}
 		
 	}//End retrieve(E target) Method
 	
@@ -82,24 +87,26 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 * @return
 	 *   The number of times that <CODE>target</CODE> occurs in this bag.
 	 **/
+	@SuppressWarnings("unchecked") //if (target.compareTo(cursor.getData()) <= 0)
 	public int countOccurrences(E target)
 	{
 		int count = 0;
-		BTNode<E> cursor = root;
 		
-		while (cursor != null){
-			if ((cursor.getData()).equals(target)){
-				count++;
-			}
-			else {
-				if (target <= cursor.getData()){
+		if (root != null){
+			BTNode<E> cursor = root;
+			
+			while (cursor != null){
+				if (target.equals(cursor.getData())){
+					count++;
+				}
+				if (target.compareTo(cursor.getData()) <= 0){
 					cursor = cursor.getLeft();
 				}
 				else {
 					cursor = cursor.getRight();
 				}
-			}//end else
-		}//end while
+			}//end while
+		}//end if
 		
 		return count;
 		
@@ -126,7 +133,14 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 **/
 	public void display()
 	{
-		root.inorderPrint();
+		//Handle null root (empty tree) case
+		if (root == null){
+			System.out.println("There are currently no elements.");
+		}
+		//Handle non-empty tree case
+		else {
+			root.inorderPrint();
+		}
 		
 	}//End display() Method
 	
@@ -142,28 +156,40 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 * @exception OutOfMemoryError
 	 *   Indicates insufficient memory a new BTNode.
 	 **/
+	@SuppressWarnings("unchecked") //if (element.compareTo(cursor.getData()) <= 0)
 	public void add(E element)
-	{      
-		BTNode<E> cursor = root;
-		
-		//Search for the correct leaf to add this element to
-		while (!cursor.isLeaf()){
-			if (cursor.getData() <= element){
-				cursor = cursor.getLeft();
-			}
-			else {
-				cursor = cursor.getRight();
-			}
-		}//end while
-		
-		//Add the element to the correct side of the leaf
-		if (cursor.getData() <= element){
-			cursor.setLeft((BTNode<E>) element);
+	{
+		//Handle null root (empty tree) case
+		if (root == null){
+			root = new BTNode<E>(element, null, null);
 		}
+		//Handle non-empty tree case
 		else {
-			cursor.setRight((BTNode<E>) element);
-		}
-		
+			BTNode<E> cursor = root;
+			boolean nodeAdded = false;
+			
+			while (!nodeAdded){
+				if (element.compareTo(cursor.getData()) <= 0){
+					if (cursor.getLeft() == null) {
+						cursor.setLeft(new BTNode<E>(element, null, null));
+						nodeAdded = true;
+					}
+					else {
+						cursor = cursor.getLeft();
+					}
+				}//end if
+				else {
+					if (cursor.getRight() == null) {
+						cursor.setRight(new BTNode<E>(element, null, null));
+						nodeAdded = true;
+					}
+					else {
+						cursor = cursor.getRight();
+					}
+				}//end else
+			}//end while
+		}//end else
+	
 	}//End add(E element) Method
 	
 	/**
