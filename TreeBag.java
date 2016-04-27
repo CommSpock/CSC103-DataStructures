@@ -22,6 +22,7 @@
 *   April 23, 2016
 ******************************************************************************************/
 
+@SuppressWarnings("rawtypes") //TreeBag<E extends Comparable>
 public class TreeBag<E extends Comparable> implements Cloneable
 {
 	// The Term E extends Comparable is letting the compiler know that any type used to instantiate E must implement Comparable. 
@@ -219,12 +220,101 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 *   If <CODE>target</CODE> was found in the bag, then one copy of <CODE>target</CODE> has been removed and the method returns true.
 	 *   Otherwise the bag remains unchanged and the method returns false.
 	 **/
+	@SuppressWarnings("unchecked") //(BTNode<E>) cursorArray[1];
 	public boolean remove(E target)
 	{
-		// Student will replace this return statement with their own code:
+		Object[] cursorArray = retrieveForRemoval(target);
+		BTNode<E> cursor = (BTNode<E>) cursorArray[1];
+		BTNode<E> parentOfCursor = (BTNode<E>) cursorArray[0];
+		
+		//If the target is null
+		if (cursor == null){
+			return false;
+		}
+		//If cursor is root and has nothing
+		else if (cursor == root && cursor.getLeft() == null && cursor.getRight() == null){
+			root = null;
+		}
+		//If cursor is root and has a null left node
+		else if (cursor == root && cursor.getLeft() == null){
+			root = root.getRight();
+		}
+		//If cursor is root and has a null right node
+		else if (cursor == root && cursor.getRight()== null){
+			root = root.getLeft();
+		}
+		//If the cursor has a left node but no right node
+		else if (cursor.getRight() == null){
+			if (cursor == parentOfCursor.getLeft()){
+				parentOfCursor.setLeft(cursor.getLeft());
+			}
+			else if (cursor == parentOfCursor.getRight()){
+				parentOfCursor.setRight(cursor.getLeft());
+			}
+		}//end else if
+		//If the cursor has a right node but no left node
+		else if (cursor.getLeft() == null){
+			if (cursor == parentOfCursor.getLeft()){
+				parentOfCursor.setLeft(cursor.getRight());
+			}
+			else if (cursor == parentOfCursor.getRight()){
+				parentOfCursor.setRight(cursor.getRight());
+			}
+		}//end else if
+		//if the cursor has left and right children
+		else {
+			cursor.setData(cursor.getLeft().getRightmostData());
+			cursor.setLeft(cursor.getLeft().removeRightmost());
+		}
+		
 		return false;
 		
 	}//End remove(E target) Method
+	
+	/**
+	 * Description
+	 * this method retrieves the target for removal - only usage is for the removal method
+	 * is Object because it returns an array of nodes
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @postcondition / return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	@SuppressWarnings("unchecked") //target.compareTo(cursor.getData()) 
+	private Object[] retrieveForRemoval(E target)
+	{
+		BTNode<E> cursor = root;
+		BTNode<E> parentOfCursor = null;
+		boolean done = false;
+		Object[] btArray = new Object[2];
+		
+		while (cursor != null && !done){
+			if (target.compareTo(cursor.getData()) == 0){
+				System.out.println("comparing true");
+				done = true;
+			}
+			else if (target.compareTo(cursor.getData()) < 0){
+				System.out.println("Comparing less");
+				parentOfCursor = cursor;
+				cursor = cursor.getLeft();
+			}
+			else if (target.compareTo(cursor.getData()) > 0){
+				parentOfCursor = cursor;
+				cursor = cursor.getRight();
+			}
+		}//end while
+		
+		btArray[1] = cursor;
+		btArray[0] = parentOfCursor;
+		return btArray;
+		
+	}//End retrieveForRemoval(E target) Method
 	
 	/**
 	 * Create a new bag that contains all the elements from two other bags.
