@@ -50,7 +50,7 @@ public class Golfer implements Comparable<Golfer>
 	 * @note
 	 *   
 	 **/
-	public Golfer(String inputName, int inputRounds, double inputAveScore, int inputHandicap)
+	public Golfer(String inputName, int inputRounds, int inputHandicap , double inputAveScore)
 	{
 		lastName = inputName;
 		numberOfRounds = inputRounds;
@@ -173,7 +173,7 @@ public class Golfer implements Comparable<Golfer>
 	public String toString()
 	{
 		//may have to import decimal formats for the score formatting
-		return "Golfer: " + lastName + "\n        Number of Rounds: " + numberOfRounds + "\n        Average Score: " + averageScore + "\n        Handicap: " + handicap;
+		return lastName + "     \t" + numberOfRounds + "\t\t\t" + handicap + "\t\t" + averageScore;
 	}//End toString() Method
 	
 	
@@ -217,7 +217,7 @@ public class Golfer implements Comparable<Golfer>
 			numberOfRounds = inputRounds;
 		}
 		else {
-			throw new IllegalArgumentException("The number of rounds has to be 0 or more!");
+			throw new IllegalArgumentException("The number of rounds must be 0 or greater!");
 		}
 		
 	}//End setNumberOfRounds(int inputRounds) Method
@@ -235,13 +235,13 @@ public class Golfer implements Comparable<Golfer>
 	 * @note
 	 *   
 	 **/
-	public void setAverageScore(double inputAveScore)
+	public void setAverageScore(double inputAvgScore)
 	{
-		if (inputAveScore > -1){
-			averageScore = inputAveScore;
+		if (inputAvgScore > -1){
+			averageScore = inputAvgScore;
 		}
 		else {
-			throw new IllegalArgumentException("The score must be 0 or more!");
+			throw new IllegalArgumentException("The average score must be 0 or greater!");
 		}
 		
 	}//End setAverageScore(double inputAveScore)
@@ -261,11 +261,11 @@ public class Golfer implements Comparable<Golfer>
 	 **/
 	public void setHandicap(int inputHandicap)
 	{
-		if (inputHandicap >=0 && inputHandicap <= 20){
+		if (inputHandicap > -1){
 			handicap = inputHandicap;
 		}
 		else {
-			throw new IllegalArgumentException("The handicap has to be between 0-20!");
+			throw new IllegalArgumentException("The handicap must be 0 or greater!");
 		}
 		
 	}//End setHandicap(int inputHandicap) Method
@@ -284,13 +284,14 @@ public class Golfer implements Comparable<Golfer>
 	 *   
 	 **/
 	public void addNewScore(double inputScore)
-	{
+	{			
+		//Increase the numberOfRounds and calculate the new averageScore
 		if (inputScore >= 1){
 			numberOfRounds++;
-			averageScore = ((averageScore + inputScore)/2);
-		}
+			averageScore = (((((double) numberOfRounds) - 1)*averageScore)+inputScore)/((double) numberOfRounds);
+		}//end if
 		else {
-			throw new IllegalArgumentException("The score must be more than 0!");
+			throw new IllegalArgumentException("The score must be greater than 0!");
 		}
 		
 	}//End addNewScore(double inputScore) Method
