@@ -44,6 +44,12 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	
 	/// Accessor Methods ///
 	
+	public BTNode getRoot()
+	{
+		return root;
+		
+	}//End BTNode getRoot() Method
+	
 	/**
 	 * Retrieve location of a specified element from this bag.
 	 * @param <CODE>target</CODE>
@@ -62,13 +68,13 @@ public class TreeBag<E extends Comparable> implements Cloneable
 			boolean done = false;
 			
 			while (cursor != null && !done){
-				if (target.compareTo(cursor.getData())<0){
+				if (target.compareTo(cursor.getData()) < 0){
 					cursor = cursor.getLeft();
 				}
-				else if (target.compareTo(cursor.getData())>0){
+				else if (target.compareTo(cursor.getData()) > 0){
 					cursor = cursor.getRight();
 				}
-				else if (target.compareTo(cursor.getData())==0){
+				else if (target.compareTo(cursor.getData()) == 0){
 					done = true;
 					return cursor.getData();
 				}
@@ -296,11 +302,9 @@ public class TreeBag<E extends Comparable> implements Cloneable
 		
 		while (cursor != null && !done){
 			if (target.compareTo(cursor.getData()) == 0){
-				System.out.println("comparing true");
 				done = true;
 			}
 			else if (target.compareTo(cursor.getData()) < 0){
-				System.out.println("Comparing less");
 				parentOfCursor = cursor;
 				cursor = cursor.getLeft();
 			}
