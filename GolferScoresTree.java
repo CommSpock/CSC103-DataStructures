@@ -17,40 +17,45 @@
 *   <p>
 *   (2) The text file selected must contain a single golfer's information on each line in the following order: 
 *   	1. Golfer's Last Name (first letter must be upper case, all other letters must be lower case, no numbers or symbols)
-*   	2. Number of Rounds (integer number)
-*   	3. Handicap (integer number)
-*   	4. Average Score (decimal number)
+*   	2. Number of Rounds (integer number between 0 and 999)
+*   	3. Handicap (integer number between 0 and 20)
+*   	4. Average Score (decimal number between 0 and 999)
 *   	For each golfer, each piece of information may be separated with any of the following delimiters: " ,;:_\t"
-*   	A text file in any format other than the specific format specified above will not work with the GolferScoresTree class.
+*   	A text file in any format other than the exact format specified above will NOT work with the GolferScoresTree class.
+*   <p>
+*   (3) To ensure a pure alphabetical ordering of golfers, rather than a lexicographical ordering based on each character's Unicode value, 
+*   	each golfer's last name should be created in the following format: 
+*   	The first letter should be upper case, while all other letters should be lower case, with no numbers or symbols.
 *
 * @version
-*   May 7, 2016
+*   May 8, 2016
 **********************************************************************************************************************/
 
-//Needed for Scanner, JFileChooser, and PrintWriter
+
+//Needed for Scanner, JFileChooser, PrintWriter, and FileNotFoundException
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
-
 
 public class GolferScoresTree
 {
 	/// Main Method of GolferScoresTree ///
 	
 	/**
-	 * Description
-	 * @param
-	 * 
-	 * @throws FileNotFoundException 
-	 * 
+	 * This method runs the golfer database simulation
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *  The text file selected must contain a single golfer's information on each line in the following order: 
+	 *   1. Golfer's Last Name (first letter must be upper case, all other letters must be lower case, no numbers or symbols)
+	 *   2. Number of Rounds (integer number between 0 and 999)
+	 *   3. Handicap (integer number between 0 and 20)
+	 *   4. Average Score (decimal number between 0 and 999)
+	 *  For each golfer, each piece of information may be separated with any of the following delimiters: " ,;:_\t"
+	 *  A text file in any format other than the exact format specified above will NOT work with the GolferScoresTree class.
+	 * @throws FileNotFoundException 
 	 * @note
-	 *   
+	 *   To ensure a pure alphabetical ordering of golfers, rather than a lexicographical ordering based on each character's Unicode value, 
+	 *   each golfer's last name should be created in the following format: 
+	 *   The first letter should be upper case, while all other letters should be lower case, with no numbers or symbols.
 	 **/
 	public static void main(String[] args) throws FileNotFoundException
 	{
@@ -88,7 +93,7 @@ public class GolferScoresTree
 				case 2: //2. Find and display one individual golfer's information
 					System.out.print("\nPlease type the last name of the golfer you would like to view: ");
 					lastName = keyboard.next();
-					currentGolfer = getGolfer(golferDatabase, lastName);
+					currentGolfer = golferDatabase.retrieve(new Golfer(lastName));
 					if (currentGolfer != null){
 						System.out.println("\nLast Name     \tNumber Of Rounds\tHandicap\tAverage Score");
 						System.out.println(currentGolfer.toString());
@@ -100,7 +105,7 @@ public class GolferScoresTree
 				case 3: //3. Update an individual golfer’s statistics
 					System.out.print("\nPlease type the last name of the golfer you would like to update: ");
 					lastName = keyboard.next();
-					currentGolfer = getGolfer(golferDatabase, lastName);
+					currentGolfer = golferDatabase.retrieve(new Golfer(lastName));
 					if (currentGolfer != null){
 						//Display the Update Golfer Stats Menu for the user to manage an individual golfer in the golferDatabase
 						updateGolferStats(currentGolfer);
@@ -112,7 +117,7 @@ public class GolferScoresTree
 				case 4: //4. Remove a golfer from the database
 					System.out.print("\nPlease type the last name of the golfer you would like to remove: ");
 					lastName = keyboard.next();
-					currentGolfer = getGolfer(golferDatabase, lastName);
+					currentGolfer = golferDatabase.retrieve(new Golfer(lastName));
 					if (currentGolfer != null){
 						golferDatabase.remove(currentGolfer);
 						System.out.println("\n" + lastName + " has been removed from the database.");
@@ -151,17 +156,19 @@ public class GolferScoresTree
 	/// Additional Methods Used by the Main Method ///
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * This method allows the user to select a golfer "database" text file to be used for this program. 
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The text file selected must contain a single golfer's information on each line in the following order: 
+	 *   1. Golfer's Last Name (first letter must be upper case, all other letters must be lower case, no numbers or symbols)
+	 *   2. Number of Rounds (integer number between 0 and 999)
+	 *   3. Handicap (integer number between 0 and 20)
+	 *   4. Average Score (decimal number between 0 and 999)
+	 *   For each golfer, each piece of information may be separated with any of the following delimiters: " ,;:_\t"
+	 *   A text file in any format other than the exact format specified above will NOT work with the GolferScoresTree class.
 	 * @note
-	 *   
+	 *   To ensure a pure alphabetical ordering of golfers, rather than a lexicographical ordering based on each character's Unicode value, 
+	 *   each golfer's last name should be created in the following format: 
+	 *   The first letter should be upper case, while all other letters should be lower case, with no numbers or symbols.
 	 **/
 	private static File FileLoader()
 	{
@@ -184,19 +191,22 @@ public class GolferScoresTree
 	}//End FileLoader() Method
 	
 	/**
-	 * Description
-	 * @param
-	 * 
-	 * @throws FileNotFoundException
-	 *   
+	 * This method reads the golfer "database" text file selected by the FileLoader() method and generates a golfer TreeBag from it to be used in this program.
+	 * @param database
+	 *   the golfer "database" text file selected by the FileLoader() method
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The database text file selected must contain a single golfer's information on each line in the following order: 
+	 *   1. Golfer's Last Name (first letter must be upper case, all other letters must be lower case, no numbers or symbols)
+	 *   2. Number of Rounds (integer number between 0 and 999)
+	 *   3. Handicap (integer number between 0 and 20)
+	 *   4. Average Score (decimal number between 0 and 999)
+	 *   For each golfer, each piece of information may be separated with any of the following delimiters: " ,;:_\t"
+	 *   A text file in any format other than the exact format specified above will NOT work with the GolferScoresTree class.
+	 * @throws FileNotFoundException
 	 * @note
-	 *   
+	 *   To ensure a pure alphabetical ordering of golfers, rather than a lexicographical ordering based on each character's Unicode value, 
+	 *   each golfer's last name should be created in the following format: 
+	 *   The first letter should be upper case, while all other letters should be lower case, with no numbers or symbols.
 	 **/
 	private static TreeBag<Golfer> createGolferDatabase(File database) throws FileNotFoundException
 	{
@@ -231,56 +241,12 @@ public class GolferScoresTree
 	}//End createGolferDatabase(File database) Method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	@SuppressWarnings("unchecked") //BTNode<Golfer> cursor = golferDatabase.getRoot();
-	private static Golfer getGolfer(TreeBag<Golfer> golferDatabase, String lastName)
-	{
-		//Instance Variables
-		Golfer currentGolfer = null; //A cursor to select and use individual golfers from the golferDatabase
-		BTNode<Golfer> cursor = golferDatabase.getRoot(); //A cursor used to traverse the golferDatabase
-		boolean found = false; //while loop stopping case
-		
-		//Run a comparable search of the golferDatabase to find the  golfer with the lastName input, then return that golfer object for use by other methods
-		while (cursor != null && !found){
-			if (lastName.compareTo(cursor.getData().getLastName()) < 0){
-				cursor = cursor.getLeft();
-			}
-			else if (lastName.compareTo(cursor.getData().getLastName()) > 0){
-				cursor = cursor.getRight();
-			}
-			else if (lastName.compareTo(cursor.getData().getLastName()) == 0){
-				found = true;
-				currentGolfer = (Golfer) cursor.getData();
-			}
-		}//end while
-		
-		return currentGolfer;
-		
-	}//End getGolfer(TreeBag<Golfer> golferDatabase, String lastName) Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * A method which displays a new Update Golfer Stats Menu where an individual golfers stats may be updated.
+	 * Stats that can be updated are number of rounds, handicap, and average score.
+	 * The user may also enter a new integer score for a single round played. This will increment the golfers
+	 * number of rounds by one and a new average score will be calculated for this golfer based on this new score.
+	 * @param player
+	 *   The golfer object whose information needs to be updated.
 	 **/
 	private static void updateGolferStats(Golfer player)
 	{
@@ -322,22 +288,45 @@ public class GolferScoresTree
 				case 1: //1. Add a score for a new round (updates number of rounds and average score for this golfer)
 					System.out.print("\nEnter new score: ");
 					score = intInput(keyboard);
-					player.addNewScore((double)score);
+					if (score < 0){
+						System.out.println("The score cannot be a negative number!\n");
+					}
+					else if (score < 1){
+						System.out.println("\nThe score must be greated than 0!\n");
+					}
+					else {
+						player.addNewScore((double)score);
+					}
 					break;
 				case 2: //2. Update this golfer's number of rounds
 					System.out.print("\nEnter number of rounds: ");
 					rounds = intInput(keyboard);
-					player.setNumberOfRounds(rounds);
+					if (rounds < 0){
+						System.out.println("The number of rounds cannot be a negative number!\n");
+					}
+					else {
+						player.setNumberOfRounds(rounds);
+					}
 					break;
 				case 3: //3. Update this golfer's handicap
 					System.out.print("\nEnter handicap: ");
 					handicap = intInput(keyboard);
-					player.setHandicap(handicap);
+					if (handicap < 0 || handicap > 20){
+						System.out.println("\nError! The handicap must be between 0-20!\n");
+					}
+					else {
+						player.setHandicap(handicap);
+					}
 					break;
 				case 4: //4. Update this golfer's average score
 					System.out.print("\nEnter average score: ");
 					avgScore = doubleInput(keyboard);
-					player.setAverageScore(avgScore);
+					if (avgScore < 0){
+						System.out.println("The average score cannot be a negative number!\n");
+					}
+					else {
+						player.setAverageScore(avgScore);
+					}
 					break;
 				case 5: //5. 5. Exit and return to the Main Menu
 					System.out.println("\n" + player.getLastName() + "'s stats updated successfully.");
@@ -353,19 +342,16 @@ public class GolferScoresTree
 	}//End updateGolferStats(Golfer player) Method
 	
 	/**
-	 * Description
-	 * @param
-	 * 
-	 * @throws FileNotFoundException
-	 *   
-	 * @precondition
-	 *   
+	 * This method overwrites the golfer "database" text file selected in the FileLoader() method with any changes made while running this program, then saves the file.
+	 * @param database
+	 *   The golfer "database" text file selected in the FileLoader() method.
+	 * @param golferDatabase
+	 *   The golfer TreeBag created by the createGolferDatabase() method.
 	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 *   The golfer "database" text file selected in the FileLoader() method has been overwritten with any changes made while running this program and saved.
+	 * @throws FileNotFoundException
+	 * @Note
+	 *   This method uses the writeToDatabase() method to actually write over the previous golfer "database" text file. Then this method saves that file.
 	 **/
 	@SuppressWarnings("unchecked") //cursor = golferDatabase.getRoot();
 	private static void FileSaver(File database, TreeBag<Golfer> golferDatabase) throws FileNotFoundException
@@ -383,17 +369,16 @@ public class GolferScoresTree
 	}//End FileSaver(File database, TreeBag<Golfer> golferDatabase) Method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 * This method overwrites the golfer "database" text file selected in the FileSaver() method with any changes made while running this program.
+	 * @param fileWriter
+	 *   The PrintWriter object that contains the required file to be overwritten.
+	 * @param cursor
+	 *   The Golfer TreeBag root node selected in the FileSaver() method.
+	 * @postcondition
+	 *   The golfer "database" text file selected in the FileSaver() method has been overwritten with any changes made while running this program, but has not been saved.
 	 * @note
-	 *   
+	 *   This method does not save any changes made to the golfer "database" text file. The changes are saved by the FileSaver() method.
+	 *   This method is only to be used by the FileSaver() method for its recursive pre-order TreeBag traversal algorithm.
 	 **/
 	private static void writeToDatabase(PrintWriter fileWriter, BTNode<Golfer> cursor)
 	{
@@ -418,17 +403,9 @@ public class GolferScoresTree
 	/// User Input Methods Used by Main and Additional Methods ///
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * This method is used to run the Main Menu for this program and catch illegal input.
+	 * @param keyboard
+	 *   The scanner object being used to take keyboard input from the user.
 	 **/
 	private static int mainMenuInput(Scanner keyboard)
 	{
@@ -463,17 +440,10 @@ public class GolferScoresTree
 	}//End mainMenuInput(Scanner keyboard) Method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * This method is used to accept integer input by the updateGolferStats() method when adding new scores, rounds, and handicaps.
+	 * It is also used to catch illegal input.
+	 * @param keyboard
+	 *   The scanner object being used to take keyboard input from the user.
 	 **/
 	private static int intInput(Scanner keyboard)
 	{
@@ -488,13 +458,10 @@ public class GolferScoresTree
 				if (input < 0 || input > 999){
 					System.out.println("\nError! You must enter a number between 0 and 999.\n");
 				}
-				if (input < 0){
-					System.out.print("Negative number detected. Please enter zero and hit return.");
-				}
 				notDone = false;
 			}//end try
 			catch (Exception e){
-				System.out.print("\nError! You must enter an integer number.\n");
+				System.out.print("\nError! You must enter an integer number. Decimal numbers, letters, and characters are not allowed.\n");
 				keyboard.nextInt();
 			}
 		}//end while
@@ -505,17 +472,10 @@ public class GolferScoresTree
 	}//End intInput(Scanner keyboard) Method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * This method is used to accept double input by the updateGolferStats() method when adding new average scores.
+	 * It is also used to catch illegal input.
+	 * @param keyboard
+	 *   The scanner object being used to take keyboard input from the user.
 	 **/
 	private static double doubleInput(Scanner keyboard)
 	{
@@ -527,16 +487,13 @@ public class GolferScoresTree
 		while (notDone){
 			try {
 				input = keyboard.nextDouble();
-				if (input < 1 || input > 999){
-					System.out.println("\nError! You must enter a number between 1 and 999.\n");
-				}
-				if (input < 0){
-					System.out.print("Negative number detected. Please enter zero and hit return.");
+				if (input < 0 || input > 999){
+					System.out.println("\nError! You must enter a number between 0 and 999.\n");
 				}
 				notDone = false;
 			}//end try
 			catch (Exception e){
-				System.out.print("\nError! You must enter a decimal number.\n");
+				System.out.print("\nError! You must enter a decimal number. Letters and characters are not allowed.\n");
 				keyboard.nextDouble();
 			}
 		}//end while
