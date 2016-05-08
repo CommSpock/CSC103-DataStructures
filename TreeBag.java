@@ -3,12 +3,12 @@
 // Section 9.5 of "Data Structures and Other Objects Using Java"
 
 // Project #4: Golfer Scores Database using a Binary Search Tree
-// Authors: Rafael Ferrer and Carmen Chiu
+// Authors: Carmen Chiu and Rafael Ferrer
 // Due Date: Monday 5/9/16
 
 /******************************************************************************************
 * This class is a homework assignment;
-* An <CODE>TreeBag</CODE> is a collection of int numbers.
+* An <CODE>TreeBag</CODE> is a collection of objects.
 *
 * <dl><dt><b>Limitations:</b> <dd>
 *   Beyond <CODE>Integer.MAX_VALUE</CODE> elements, <CODE>countOccurrences</CODE>,
@@ -19,8 +19,9 @@
 *   because this is a Programming Project for my students.
 *
 * @version
-*   April 23, 2016
+*   May 8, 2016
 ******************************************************************************************/
+
 
 @SuppressWarnings("rawtypes") //TreeBag<E extends Comparable>
 public class TreeBag<E extends Comparable> implements Cloneable
@@ -44,6 +45,11 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	
 	/// Accessor Methods ///
 	
+	/**
+	 * An accessor method that returns the root node of a TreeBag.
+	 * @return
+	 *   Returns the root node of a TreeBag.
+	 **/
 	public BTNode getRoot()
 	{
 		return root;
@@ -200,25 +206,6 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	}//End add(E element) Method
 	
 	/**
-	 * Add the contents of another bag to this bag.
-	 * @param <CODE>addend</CODE>
-	 *   A bag whose contents will be added to this bag.
-	 * <dt><b>Precondition:</b><dd>
-	 *   The parameter, <CODE>addend</CODE>, is not null.
-	 * <dt><b>Postcondition:</b><dd>
-	 *   The elements from <CODE>addend</CODE> have been added to this bag.
-	 * @exception IllegalArgumentException
-	 *   Indicates that <CODE>addend</CODE> is null.
-	 * @exception OutOfMemoryError
-	 *   Indicates insufficient memory to increase the size of the bag.
-	 **/
-	public void addAll(TreeBag<E> addend)
-	{
-		// Implemented by student.
-		
-	}//End addAll(TreeBag<E> addend) Method
-	
-	/**
 	 * Remove one copy of a specified element from this bag.
 	 * @param <CODE>target</CODE>
 	 *   The element to remove from the bag.
@@ -278,19 +265,14 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	}//End remove(E target) Method
 	
 	/**
-	 * Description
-	 * this method retrieves the target for removal - only usage is for the removal method
+	 * This method retrieves the target for removal. Its only usage is for the removal method.
 	 * is Object because it returns an array of nodes
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * @param target
+	 *   The target object being removed.
+	 * @return
+	 *   An object array containing two cursors. 
+	 *   One cursor points to the target object for removal.
+	 *   The other cursor points to the parent node of the target object for removal.
 	 **/
 	@SuppressWarnings("unchecked") //target.compareTo(cursor.getData()) 
 	private Object[] retrieveForRemoval(E target)
@@ -321,6 +303,27 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	}//End retrieveForRemoval(E target) Method
 	
 	/**
+	 * The addAll() method is NOT implemented for this project.
+	 * Add the contents of another bag to this bag.
+	 * @param <CODE>addend</CODE>
+	 *   A bag whose contents will be added to this bag.
+	 * <dt><b>Precondition:</b><dd>
+	 *   The parameter, <CODE>addend</CODE>, is not null.
+	 * <dt><b>Postcondition:</b><dd>
+	 *   The elements from <CODE>addend</CODE> have been added to this bag.
+	 * @exception IllegalArgumentException
+	 *   Indicates that <CODE>addend</CODE> is null.
+	 * @exception OutOfMemoryError
+	 *   Indicates insufficient memory to increase the size of the bag.
+	 **/
+	public void addAll(TreeBag<E> addend)
+	{
+		//Not implemented for this project.
+		
+	}//End addAll(TreeBag<E> addend) Method
+	
+	/**
+	 * The union() method is NOT implemented for this project.
 	 * Create a new bag that contains all the elements from two other bags.
 	 * @param <CODE>b1</CODE>
 	 *   The first of two bags.
@@ -337,7 +340,7 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 **/   
 	public static TreeBag union(TreeBag b1, TreeBag b2)
 	{
-		// Student will replace this return statement with their own code:
+		//Not implemented for this project.
 		return null;
 		
 	}//End union(TreeBag b1, TreeBag b2) Method
@@ -346,6 +349,7 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	/// Cloneable Interface ///
 	
 	/**
+	 * The clone() method is NOT implemented for this project.
 	 * Generate a copy of this bag.
 	 * @param - none
 	 * @return
@@ -356,12 +360,9 @@ public class TreeBag<E extends Comparable> implements Cloneable
 	 **/
 	public TreeBag<E> clone()
 	{
-		// Clone an IntTreeBag object.
-		// Student will replace this return statement with their own code:
+		//Not implemented for this project.
 		return null;
 		
 	}//End clone() Method
 	
-	
 }//End TreeBag Class
-
