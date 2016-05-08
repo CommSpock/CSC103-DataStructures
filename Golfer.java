@@ -1,32 +1,26 @@
 // File: Golfer.java
-
+ 
 // Project #4: Golfer Scores Database using a Binary Search Tree
 // Authors: Carmen Chiu and Rafael Ferrer
 // Due Date: Monday 5/9/16
-
-/******************************************************************************************
-* This class is a homework assignment;
-* An <CODE>TreeBag</CODE> is a collection of int numbers.
-*
-* <dl><dt><b>Limitations:</b> <dd>
-*   Beyond <CODE>Integer.MAX_VALUE</CODE> elements, <CODE>countOccurrences</CODE>,
-*   and <CODE>size</CODE> are wrong. 
-*
-* <dt><b>Note:</b><dd>
-*   This file contains only blank implementations ("stubs")
-*   because this is a Programming Project for my students.
-*
+ 
+/************************************************************************************************
+* The Golfer class is used in conjunction with the GolferScoresTree, BTNode and TreeBag classes 
+* to simulate a database of golfers. Each golfer has a last name, average score, handicap, and 
+* number of rounds played.
+*   
 * @version
-*   April 23, 2016
-******************************************************************************************/
+*   May 8, 2016
+************************************************************************************************/
+
 
 public class Golfer implements Comparable<Golfer>
 {
-	// Invariant of the TreeBag class:
-	//   1. 
-	//   2. 
-	//   3. 
-	//   4. 
+	// Invariant of the Golfer class:
+    //   1. The lastName is a string representing the last name of a golfer.
+    //   2. The numberOfRounds is an integer representing how many rounds a golfer has played.
+    //   3. The averageScore is a double representing the golfer's average score.
+    //   4. The handicap is an integer representing the golfer's handicap.
 	
 	/// Instance Variables ///
 	private String lastName;
@@ -38,61 +32,76 @@ public class Golfer implements Comparable<Golfer>
 	/// Constructors ///
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * A constructor to create a new golfer object with a last name, rounds played, handicap, and average score.
+	 * @param inputName
+	 *   The last name of this golfer.
+	 * @param inputRounds
+	 *   The number of rounds this golfer has played.
+	 * @param inputHandicap
+	 *   The average score of this golfer.
+	 * @param inputAvgScore
+	 *   The handicap for this golfer.
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The argument passed for inputRounds is greater then zero and less than Int.MAX_VALUE.
+	 *   The argument passed for inputHandicap is between 0 and 20.
+	 *   The argument passed for inputAvgScore is between 0 and Double.MAX_VALUE.
+	 * @postcondition
+	 *   A new golfer has been created with the attributes input.
+	 * @exception IllegalArgumentException
+	 *   Will occur if the handicap is not between 0 and 20.
 	 * @note
-	 *   
+	 *   The golfer's last name should be entered in the following format if the String's compareTo method will be used to sort golfers alphabetically: 
+	 *   The first letter should be upper case, while all other letters should be lower case, with no numbers or symbols.
 	 **/
-	public Golfer(String inputName, int inputRounds, int inputHandicap , double inputAveScore)
+	public Golfer(String inputName, int inputRounds, int inputHandicap , double inputAvgScore)
 	{
 		lastName = inputName;
-		numberOfRounds = inputRounds;
-		averageScore = inputAveScore;
-		handicap = inputHandicap;
 		
-	}//End Golfer(String inputName, int inputRounds, double inputAveScore, int inputHandicap) Constructor
+		//Verify arguments are legal and set golfer attributes if so.
+		if (inputRounds > -1){
+			numberOfRounds = inputRounds;
+		}
+		else {
+			throw new IllegalArgumentException("The number of rounds must be 0 or greater!");
+		}
+		if (inputHandicap > -1 && inputHandicap < 21){
+			handicap = inputHandicap;
+		}
+		else {
+			throw new IllegalArgumentException("The handicap must be between 0-20!");
+		}
+		if (inputAvgScore > -1){
+			averageScore = inputAvgScore;
+		}
+		else {
+			throw new IllegalArgumentException("The average score must be 0 or greater!");
+		}
+		
+	}//End Golfer(String inputName, int inputRounds, double inputAvgScore, int inputHandicap) Constructor
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 * A constructor to create a new golfer object with a last name.
+	 * @param inputName
+	 *   The last name of this golfer.
+	 * @postcondition
+	 *   A new golfer has been created with the last name inputName. All other golfer attributes will be set to zero.
 	 * @note
-	 *   
+	 *   The golfer's last name should be entered in the following format if the String's compareTo method will be used to sort golfers alphabetically: 
+	 *   The first letter should be upper case, while all other letters should be lower case, with no numbers or symbols.
 	 **/
-	public Golfer(String name)
+	public Golfer(String inputName)
 	{
-		this(name,0,0,0);
+		this(inputName,0,0,0);
 		
-	}//End Golfer(String name) Constructor
+	}//End Golfer(String inputName) Constructor
 	
 	
 	/// Accessor Methods ///
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * An accessor method that returns the golfer's last name.
+	 * @return
+	 *   A string value containing the golfer's last name.
 	 **/
 	public String getLastName()
 	{
@@ -101,17 +110,9 @@ public class Golfer implements Comparable<Golfer>
 	}//End getLastName() Method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * An accessor method that returns the number of rounds a golfer has played.
+	 * @return
+	 *   An integer value signifying the number of rounds a golfer played. 
 	 **/
 	public int getNumberOfRounds()
 	{
@@ -120,36 +121,9 @@ public class Golfer implements Comparable<Golfer>
 	}//End getNumberOfRounds() Method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public double getAverageScore()
-	{
-		return averageScore;
-		
-	}//End getAverageScore() Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * An accessor method that returns the handicap.
+	 * @return
+	 *   An integer value representing the handicap of the golfer.
 	 **/
 	public int getHandicap()
 	{
@@ -158,21 +132,23 @@ public class Golfer implements Comparable<Golfer>
 	}//End getHandicap() Method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * An accessor method that returns the average score.
+	 * @return
+	 *   A double value signifying the average score of the golfer.
+	 **/
+	public double getAverageScore()
+	{
+		return averageScore;
+		
+	}//End getAverageScore() Method
+	
+	/**
+	 * A method that returns the golfer's information in a string.
+	 * @return
+	 *   A string containing the golfer's last name, number of rounds, handicap, and average score. 
 	 **/
 	public String toString()
 	{
-		//may have to import decimal formats for the score formatting
 		return lastName + "     \t" + numberOfRounds + "\t\t\t" + handicap + "\t\t" + averageScore;
 	}//End toString() Method
 	
@@ -180,17 +156,14 @@ public class Golfer implements Comparable<Golfer>
 	/// Modifier Methods ///
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 * A modifier method that changes the name of a golfer.
+	 * @param inputName
+	 *   The new last name of this golfer.
+	 * @postcondition
+	 *   This golfers last name has been changed to the inputName.
 	 * @note
-	 *   
+	 *   The golfer's last name should be entered in the following format if the String's compareTo method will be used to sort golfers alphabetically:
+	 *   The first letter should be upper case, while all other letters should be lower case, with no numbers or symbols.
 	 **/
 	public void setLastName(String inputName)
 	{
@@ -199,17 +172,17 @@ public class Golfer implements Comparable<Golfer>
 	}//End setLastName(String inputName) Method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * A modifier method that changes the number of rounds a golfer has played.
+	 * @param inputRounds
+	 *   An integer value that the number of rounds should be change to.
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The argument passed for inputRounds is greater then zero and less than Int.MAX_VALUE.
+	 * @postcondition
+	 *   The golfer's number of rounds has been changed to inputRounds.
+	 * @exception IllegalArgumentException
+	 *   Will occur if inputRounds is less than 0.
 	 * @note
-	 *   
+	 *   The number of rounds is automatically updated when the addNewScore(double inputScore) method is called.
 	 **/
 	public void setNumberOfRounds(int inputRounds)
 	{
@@ -223,17 +196,39 @@ public class Golfer implements Comparable<Golfer>
 	}//End setNumberOfRounds(int inputRounds) Method
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * A modifier method that changes the handicap for a golfer.
+	 * @param inputHandicap
+	 *   An integer value  that the handicap should be changed to.
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The argument passed for inputHandicap is greater then zero and less than 20.
+	 * @postcondition
+	 *   The golfer's handicap has been changed to inputHandicap.
+	 * @exception IllegalArgumentException
+	 *   Will occur if inputHandicap is less than 0 or greater than 20.
+	 **/
+	public void setHandicap(int inputHandicap)
+	{
+		if (inputHandicap > -1 && inputHandicap < 21){
+			handicap = inputHandicap;
+		}
+		else {
+			throw new IllegalArgumentException("The handicap must be between 0-20!");
+		}
+		
+	}//End setHandicap(int inputHandicap) Method
+	
+	/**
+	 * A modifier method that changes the average score of a golfer.
+	 * @param inputAvgScore
+	 *   A double value that the average score should be change to.
+	 * @precondition
+	 *   The argument passed for inputAvgScore is greater then zero and less than Double.MAX_VALUE.
+	 * @postcondition
+	 *   The golfer's average score has been changed to inputAvgScore.
+	 * @exception IllegalArgumentException
+	 *   Will occur if inputAvgScore is less than 0.
 	 * @note
-	 *   
+	 *   The average score is automatically updated when the addNewScore(double inputScore) method is called.
 	 **/
 	public void setAverageScore(double inputAvgScore)
 	{
@@ -244,54 +239,31 @@ public class Golfer implements Comparable<Golfer>
 			throw new IllegalArgumentException("The average score must be 0 or greater!");
 		}
 		
-	}//End setAverageScore(double inputAveScore)
+	}//End setAverageScore(double inputAvgScore)
 	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * A modifier method that increments a golfer's number of rounds by one and calculates a new average score based on the inputScore.
+	 * @param inputScore
+	 *   An integer score for a single round played.
 	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 *   The argument passed for inputScore is greater than one and less than Int.MAX_VALUE.
+	 * @postcondition
+	 *   The golfer's number of rounds has been incremented by one and a new average score has been calculated for this golfer.
+	 * @exception IllegalArgumentException
+	 *   Will occur if inputScore is less than one.
 	 * @note
-	 *   
-	 **/
-	public void setHandicap(int inputHandicap)
-	{
-		if (inputHandicap > -1){
-			handicap = inputHandicap;
-		}
-		else {
-			throw new IllegalArgumentException("The handicap must be 0 or greater!");
-		}
-		
-	}//End setHandicap(int inputHandicap) Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 *   This method accurately calculates the golfer's new average score with their previous average score and a single new score.
+	 *   No record of previous individual scores for each round played is required to calculate the correct average score.
 	 **/
 	public void addNewScore(double inputScore)
 	{			
-		//Increase the numberOfRounds and calculate the new averageScore
 		if (inputScore >= 1){
+			//Increment this golfer's numberOfRounds by one and calculate their new averageScore
 			numberOfRounds++;
 			averageScore = (((((double) numberOfRounds) - 1)*averageScore)+inputScore)/((double) numberOfRounds);
-		}//end if
+		}
 		else {
-			throw new IllegalArgumentException("The score must be greater than 0!");
+			throw new IllegalArgumentException("The new score must be greater than 0!");
 		}
 		
 	}//End addNewScore(double inputScore) Method
@@ -300,25 +272,23 @@ public class Golfer implements Comparable<Golfer>
 	/// Comparable Interface ///
 	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
+	 * A method that returns an integer comparison based on the lexicographical order of the golfers last name's.
+	 * The comparison is based on the Unicode value of each character in a golfer's last name. 
+	 * @param inputGolfer
+	 *   The Golfer object to compare to other Golfer objects.
+	 * @return
+	 *   Returns a negative integer if inputGolfer's last name precedes this Golfer's lastName lexicographically.
+	 *   Returns a positive integer if inputGolfer's last name follows this Golfer's lastName lexicographically.
+	 *   Returns zero if inputGolfer's last name is the same as this Golfer's lastName.
 	 * @note
-	 *   
+	 *   To ensure a pure alphabetical ordering, rather than a lexicographical ordering based on each characters Unicode value, 
+	 *   the golfer's last name should be entered in the following format: 
+	 *   The first letter should be upper case, while all other letters should be lower case, with no numbers or symbols.
 	 **/
 	public int compareTo(Golfer inputGolfer)
 	{
 		int comparison;
 		
-		//Returns a negative integer if inputGolfer's last name precedes this Golfer's lastName alphabetically
-		//Returns a positive integer if inputGolfer's last name follows this Golfer's lastName alphabetically
-		//Returns zero if inputGolfer's last name is the same as this Golfer's lastName
 		comparison = lastName.compareTo(inputGolfer.getLastName());
 		
 		return comparison;
