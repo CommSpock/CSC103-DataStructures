@@ -42,13 +42,15 @@ public class Golfer implements Comparable<Golfer>
 	 * @param inputAvgScore
 	 *   The handicap for this golfer.
 	 * @precondition
-	 *   The argument passed for inputRounds is greater then zero and less than Int.MAX_VALUE.
-	 *   The argument passed for inputHandicap is between 0 and 20.
-	 *   The argument passed for inputAvgScore is between 0 and Double.MAX_VALUE.
+	 *   The argument passed for inputRounds is an integer value greater then zero and less than Int.MAX_VALUE.
+	 *   The argument passed for inputHandicap is an integer value between 0 and 20.
+	 *   The argument passed for inputAvgScore is a double value between 0 and Double.MAX_VALUE.
 	 * @postcondition
 	 *   A new golfer has been created with the attributes input.
 	 * @exception IllegalArgumentException
-	 *   Will occur if the handicap is not between 0 and 20.
+	 *   Will occur if inputRounds is less than 0 or not an integer value.
+	 *   Will occur if inputHandicap is not between 0 and 20 or not an integer value.
+	 *   Will occur if inputAvgScore is less than 0 or not a double value.
 	 * @note
 	 *   The golfer's last name should be entered in the following format if the String's compareTo method will be used to sort golfers alphabetically: 
 	 *   The first letter should be upper case, while all other letters should be lower case, with no numbers or symbols.
@@ -176,11 +178,11 @@ public class Golfer implements Comparable<Golfer>
 	 * @param inputRounds
 	 *   An integer value that the number of rounds should be change to.
 	 * @precondition
-	 *   The argument passed for inputRounds is greater then zero and less than Int.MAX_VALUE.
+	 *   The argument passed for inputRounds is an integer value greater then zero and less than Int.MAX_VALUE.
 	 * @postcondition
 	 *   The golfer's number of rounds has been changed to inputRounds.
 	 * @exception IllegalArgumentException
-	 *   Will occur if inputRounds is less than 0.
+	 *   Will occur if inputRounds is less than 0 or not an integer value.
 	 * @note
 	 *   The number of rounds is automatically updated when the addNewScore(double inputScore) method is called.
 	 **/
@@ -200,11 +202,11 @@ public class Golfer implements Comparable<Golfer>
 	 * @param inputHandicap
 	 *   An integer value  that the handicap should be changed to.
 	 * @precondition
-	 *   The argument passed for inputHandicap is greater then zero and less than 20.
+	 *   The argument passed for inputHandicap is an integer value between 0 and 20.
 	 * @postcondition
 	 *   The golfer's handicap has been changed to inputHandicap.
 	 * @exception IllegalArgumentException
-	 *   Will occur if inputHandicap is less than 0 or greater than 20.
+	 *   Will occur if inputHandicap is not between 0 and 20 or not an integer value.
 	 **/
 	public void setHandicap(int inputHandicap)
 	{
@@ -222,11 +224,11 @@ public class Golfer implements Comparable<Golfer>
 	 * @param inputAvgScore
 	 *   A double value that the average score should be change to.
 	 * @precondition
-	 *   The argument passed for inputAvgScore is greater then zero and less than Double.MAX_VALUE.
+	 *   The argument passed for inputAvgScore is a double value between 0 and Double.MAX_VALUE.
 	 * @postcondition
 	 *   The golfer's average score has been changed to inputAvgScore.
 	 * @exception IllegalArgumentException
-	 *   Will occur if inputAvgScore is less than 0.
+	 *   Will occur if inputAvgScore is less than 0 or not a double value.
 	 * @note
 	 *   The average score is automatically updated when the addNewScore(double inputScore) method is called.
 	 **/
@@ -246,11 +248,11 @@ public class Golfer implements Comparable<Golfer>
 	 * @param inputScore
 	 *   An integer score for a single round played.
 	 * @precondition
-	 *   The argument passed for inputScore is greater than one and less than Int.MAX_VALUE.
+	 *   The argument passed for inputScore is an integer value greater than one and less than Int.MAX_VALUE.
 	 * @postcondition
 	 *   The golfer's number of rounds has been incremented by one and a new average score has been calculated for this golfer.
 	 * @exception IllegalArgumentException
-	 *   Will occur if inputScore is less than one.
+	 *   Will occur if inputScore is less than one or not an integer value.
 	 * @note
 	 *   This method accurately calculates the golfer's new average score with their previous average score and a single new score.
 	 *   No record of previous individual scores for each round played is required to calculate the correct average score.
