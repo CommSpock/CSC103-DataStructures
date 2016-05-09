@@ -21,7 +21,8 @@
 *   	3. Handicap (integer number between 0 and 20)
 *   	4. Average Score (decimal number between 0 and 999)
 *   	For each golfer, each piece of information may be separated with any of the following delimiters: " ,;:_\t"
-*   	A text file in any format other than the exact format specified above will NOT work with the GolferScoresTree class.
+*   	An empty text file may also be loaded to begin a new empty golfer "database".
+*   	A text file in any format other than the exact formats specified above will NOT work with the GolferScoresTree class.
 *   <p>
 *   (3) To ensure a pure alphabetical ordering of golfers, rather than a lexicographical ordering based on each character's Unicode value, 
 *   	each golfer's last name should be created in the following format: 
@@ -50,7 +51,8 @@ public class GolferScoresTree
 	 *   3. Handicap (integer number between 0 and 20)
 	 *   4. Average Score (decimal number between 0 and 999)
 	 *  For each golfer, each piece of information may be separated with any of the following delimiters: " ,;:_\t"
-	 *  A text file in any format other than the exact format specified above will NOT work with the GolferScoresTree class.
+	 *  An empty text file may also be loaded to begin a new empty golfer "database".
+	 *  A text file in any format other than the exact formats specified above will NOT work with the GolferScoresTree class.
 	 * @throws FileNotFoundException 
 	 * @note
 	 *   To ensure a pure alphabetical ordering of golfers, rather than a lexicographical ordering based on each character's Unicode value, 
@@ -67,82 +69,94 @@ public class GolferScoresTree
 		int choice = -1; //The user's menu selection number
 		Scanner keyboard = new Scanner (System.in); //Scanner used to obtain user input from the keyboard
 		
-		//User greeting and golfer database file selection
+		//Startup Message
 		System.out.println("<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>");
 		System.out.println("<<    Golfer Database Management System    >>");
 		System.out.println("<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>\n");
+		
+		//Select the golfer "database" text file to use
 		System.out.println("Please select the golfer database file you would like to use...");
+		System.out.println("Note: You may select an empty text file to begin a new empty golfer database.\n");
 		database = FileLoader();
-		System.out.println("You have selected the file located at " + database.toString());
 		
-		//Read the database text file and construct a TreeBag<Golfer> object to assign to golferDatabase
-		golferDatabase = createGolferDatabase(database);
+		//Run the program with the selected database file, or close the program if no file was chosen
+		if (database != null){
 		
-		//Display the Main Menu for the user to manage the database
-		while (choice != 6 && choice != 7){
+			//Read the database text file and construct a TreeBag<Golfer> object to assign to golferDatabase
+			golferDatabase = createGolferDatabase(database);
 			
-			//Obtain user's Main Menu selection
-			choice = mainMenuInput(keyboard);
-			
-			//Main Menu Switch Board
-			switch(choice){
-				case 1: //1. Display all golfer’s information ordered by last name
-					System.out.println("\nLast Name     \tNumber Of Rounds\tHandicap\tAverage Score");
-					golferDatabase.display();
-					break;
-				case 2: //2. Find and display one individual golfer's information
-					System.out.print("\nPlease type the last name of the golfer you would like to view: ");
-					lastName = keyboard.next();
-					currentGolfer = golferDatabase.retrieve(new Golfer(lastName));
-					if (currentGolfer != null){
-						System.out.println("\nLast Name     \tNumber Of Rounds\tHandicap\tAverage Score");
-						System.out.println(currentGolfer.toString());
-					}
-					else {
-						System.out.println("\nNo golfer with the name " + lastName + " could be found in the database!");
-					}
-					break;
-				case 3: //3. Update an individual golfer’s statistics
-					System.out.print("\nPlease type the last name of the golfer you would like to update: ");
-					lastName = keyboard.next();
-					currentGolfer = golferDatabase.retrieve(new Golfer(lastName));
-					if (currentGolfer != null){
-						//Display the Update Golfer Stats Menu for the user to manage an individual golfer in the golferDatabase
-						updateGolferStats(currentGolfer);
-					}
-					else {
-						System.out.println("\nNo golfer with the name " + lastName + " could be found in the database!");
-					}
-					break;
-				case 4: //4. Remove a golfer from the database
-					System.out.print("\nPlease type the last name of the golfer you would like to remove: ");
-					lastName = keyboard.next();
-					currentGolfer = golferDatabase.retrieve(new Golfer(lastName));
-					if (currentGolfer != null){
-						golferDatabase.remove(currentGolfer);
-						System.out.println("\n" + lastName + " has been removed from the database.");
-					}
-					else {
-						System.out.println("\nNo golfer with the name " + lastName + " could be found in the database!");
-					}
-					break;
-				case 5: //5. Add a new golfer to the database
-					System.out.println("\nThe first letter of the golfer's last name must be upper case and all other letters must be lower case. \nNo numbers or symbols allowed.");
-					System.out.print("\nPlease enter the last name of the golfer you would like to add: ");
-					lastName = keyboard.next();
-					currentGolfer = new Golfer(lastName);
-					golferDatabase.add(currentGolfer);
-					System.out.println("\n" + lastName + " has been added to the database.");
-					break;
-				case 6: //6. Quit and update the database file
-					FileSaver(database, golferDatabase);
-					System.out.println("\nGolfer database updated successfully.");
-					break;
-				case 7: //7. Quit without updating the database file
-					System.out.println("\nGolfer database was not updated.");
-					break;
-			}//end switch
-		}//end while
+			//Display the Main Menu for the user to manage the database
+			while (choice != 6 && choice != 7){
+				
+				//Obtain user's Main Menu selection
+				choice = mainMenuInput(keyboard);
+				
+				//Main Menu Switch Board
+				switch(choice){
+					case 1: //1. Display all golfer’s information ordered by last name
+						if (golferDatabase.size() > 0){
+							System.out.println("\nLast Name     \tNumber Of Rounds\tHandicap\tAverage Score");
+							golferDatabase.display();
+						}
+						else {
+							System.out.println("\nThis golfer database is currently empty.\nYou may add golfers by selecting option 5 from thr Main Menu.");
+						}
+						break;
+					case 2: //2. Find and display one individual golfer's information
+						System.out.print("\nPlease type the last name of the golfer you would like to view: ");
+						lastName = keyboard.next();
+						currentGolfer = golferDatabase.retrieve(new Golfer(lastName));
+						if (currentGolfer != null){
+							System.out.println("\nLast Name     \tNumber Of Rounds\tHandicap\tAverage Score");
+							System.out.println(currentGolfer.toString());
+						}
+						else {
+							System.out.println("\nNo golfer with the name " + lastName + " could be found in the database!");
+						}
+						break;
+					case 3: //3. Update an individual golfer’s statistics
+						System.out.print("\nPlease type the last name of the golfer you would like to update: ");
+						lastName = keyboard.next();
+						currentGolfer = golferDatabase.retrieve(new Golfer(lastName));
+						if (currentGolfer != null){
+							//Display the Update Golfer Stats Menu for the user to manage an individual golfer in the golferDatabase
+							updateGolferStats(currentGolfer);
+						}
+						else {
+							System.out.println("\nNo golfer with the name " + lastName + " could be found in the database!");
+						}
+						break;
+					case 4: //4. Remove a golfer from the database
+						System.out.print("\nPlease type the last name of the golfer you would like to remove: ");
+						lastName = keyboard.next();
+						currentGolfer = golferDatabase.retrieve(new Golfer(lastName));
+						if (currentGolfer != null){
+							golferDatabase.remove(currentGolfer);
+							System.out.println("\n" + lastName + " has been removed from the database.");
+						}
+						else {
+							System.out.println("\nNo golfer with the name " + lastName + " could be found in the database!");
+						}
+						break;
+					case 5: //5. Add a new golfer to the database
+						System.out.println("\nThe first letter of the golfer's last name should be upper case and all letters following it should be lower case.");
+						System.out.println("Additionally, no spaces, numbers, or symbols should be used in the golfer's last name.");
+						System.out.print("Please enter the last name of the golfer you would like to add: ");
+						lastName = keyboard.next();
+						currentGolfer = new Golfer(lastName);
+						golferDatabase.add(currentGolfer);
+						System.out.println("\n" + lastName + " has been added to the database.");
+						break;
+					case 6: //6. Quit and update the database file
+						FileSaver(database, golferDatabase);
+						System.out.println("\nGolfer database updated successfully.");
+						break;
+					case 7: //7. Quit without updating the database file
+						System.out.println("\nGolfer database was not updated.");
+						break;
+				}//end switch
+			}//end while
+		}//end if
 		
 		//Exit Message
 		System.out.println("\n\n<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -164,7 +178,8 @@ public class GolferScoresTree
 	 *   3. Handicap (integer number between 0 and 20)
 	 *   4. Average Score (decimal number between 0 and 999)
 	 *   For each golfer, each piece of information may be separated with any of the following delimiters: " ,;:_\t"
-	 *   A text file in any format other than the exact format specified above will NOT work with the GolferScoresTree class.
+	 *   An empty text file may also be loaded to begin a new empty golfer "database".
+	 *   A text file in any format other than the exact formats specified above will NOT work with the GolferScoresTree class.
 	 * @note
 	 *   To ensure a pure alphabetical ordering of golfers, rather than a lexicographical ordering based on each character's Unicode value, 
 	 *   each golfer's last name should be created in the following format: 
@@ -183,8 +198,27 @@ public class GolferScoresTree
 		//Once a file has been selected, return that file
 		if (status == JFileChooser.APPROVE_OPTION){
 			database = fileSelector.getSelectedFile();
+			System.out.println("You have selected the file located at " + database.toString());
 			return database;
 		}
+		//If no file is selected, give the user a second chance to select a file or close the program
+		else if (status == JFileChooser.CANCEL_OPTION){
+			System.out.println("You must select a golfer database file to continue...");
+			System.out.println("Or you may click 'Cancel' again to close the program.");
+			//Launch the JFileChooser window to select the file to be used as the database
+			status = fileSelector.showOpenDialog(null);
+			//Once a file has been selected, return that file
+			if (status == JFileChooser.APPROVE_OPTION){
+				database = fileSelector.getSelectedFile();
+				System.out.println("You have selected the file located at " + database.toString());
+				return database;
+			}
+			//Close the program if no file is selected
+			else {
+				//The program will halt after returning null
+				return null;
+			}
+		}//end else if
 		
 		return null;
 		
@@ -201,7 +235,8 @@ public class GolferScoresTree
 	 *   3. Handicap (integer number between 0 and 20)
 	 *   4. Average Score (decimal number between 0 and 999)
 	 *   For each golfer, each piece of information may be separated with any of the following delimiters: " ,;:_\t"
-	 *   A text file in any format other than the exact format specified above will NOT work with the GolferScoresTree class.
+	 *   An empty text file may also be loaded to begin a new empty golfer "database".
+	 *   A text file in any format other than the exact formats specified above will NOT work with the GolferScoresTree class.
 	 * @throws FileNotFoundException
 	 * @note
 	 *   To ensure a pure alphabetical ordering of golfers, rather than a lexicographical ordering based on each character's Unicode value, 
