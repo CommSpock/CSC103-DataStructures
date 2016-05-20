@@ -1,7 +1,7 @@
 // File: TableDoubleHash.java
 
 // Project #4: Analysis of Hashing versus Double Hashing
-// Authors: Rafael Ferrer and Carmen Chiu
+// Authors: Rafael Ferrer
 // Due Date: Monday 5/22/16
 
 /****************************************************************************************************
@@ -36,6 +36,10 @@ public class TableDoubleHash< K , E >
 	/// Private Instance Variables ///
 	
 	private int manyItems;
+	private double avgCollisions;
+	private int maxCollisions;
+	private int firstCollisions;
+	private int totalCollisions;
 	private Object[] keys;
 	private Object[] data;
 	private boolean[] hasBeenUsed;   
@@ -139,7 +143,7 @@ public class TableDoubleHash< K , E >
 				return i;
 			}
 			count++;
-			i = nextIndex(i);
+			i = nextIndex(i, key);
 		}//end while
 		
 		return -1;
@@ -159,16 +163,87 @@ public class TableDoubleHash< K , E >
 	 * @note
 	 *   
 	 **/
-	private int nextIndex(int i)
+	private int nextIndex(int i, K key)
 	{
-		if (i+1 == data.length){
-			return 0;
-		}
-		else {
-			return i+1;
-		}
+		return (i + doubleHash(key)) % data.length;
 	
 	}//End nextIndex(int i) Method
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public double getAvgCollisions()
+	{
+		return avgCollisions;
+		
+	}//End getAvgCollisions() Method
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public int getMaxCollisions()
+	{
+		return maxCollisions;
+		
+	}//End getMaxCollisions() Method
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public int getFirstCollisions()
+	{
+		return firstCollisions;
+		
+	}//End getFirstCollisions() Method
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public int getTotalCollisions()
+	{
+		return totalCollisions;
+		
+	}//End getTotalCollisions() Method
 	
 	
 	/// Modifier Methods ///
@@ -190,6 +265,26 @@ public class TableDoubleHash< K , E >
 	private int hash(Object key)
 	{
 		return Math.abs(key.hashCode( )) % data.length;
+		
+	}//End hash(Object key) Method
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @return
+	 *  The return value is a valid index of the table’s arrays. The index is calculated as the remainder 
+	 *  when the absolute value of the key’s hash code is divided by the size of the table’s arrays.
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	private int doubleHash(Object key)
+	{
+		return Math.abs(key.hashCode( )) % (data.length-2);
 		
 	}//End hash(Object key) Method
 	
@@ -217,6 +312,7 @@ public class TableDoubleHash< K , E >
 	{
 		//Instance Variables
 		int index = findIndex(key);
+		int elementCollisions = 0;
 		E answer;
 		
 		// The key is already in the table.
@@ -228,13 +324,22 @@ public class TableDoubleHash< K , E >
 		// The key is not yet in this Table.
 		else if (manyItems < data.length){
 			index = hash(key);
+			if (keys[index] != null){
+				firstCollisions++;
+			}
 			while (keys[index] != null){
-				index = nextIndex(index);
+				index = nextIndex(index, key);
+				elementCollisions++;
 			}
 			keys[index] = key;
 			data[index] = element;
 			hasBeenUsed[index] = true;
-			manyItems++;
+			++manyItems;
+			totalCollisions = totalCollisions + elementCollisions;
+			avgCollisions = (((((double) manyItems) - 1)*avgCollisions)+elementCollisions)/((double) manyItems);
+			if (elementCollisions > maxCollisions){
+				maxCollisions = elementCollisions;
+			}
 			return null;
 		}//end else if
 		// The table is full.
@@ -273,6 +378,35 @@ public class TableDoubleHash< K , E >
 		return answer;
 		
 	}//End remove(K key) Class
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @postcondition / return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public void printTable()
+	{		
+		int i = 0;
+		
+		while (i < 240){
+			System.out.println(i + "  " + data[i] + "\t\t" + (i+1) + "  " + data[i+1] + "\t\t" + (i+2) + "  " + data[i+2] + "\t\t" + (i+3) + "  " + data[i+3]);
+			i = i + 4;
+		}
+		i = 240;
+		while (i < 241){
+			System.out.println(i + "  " + data[i]);
+			i++;
+		}
+		
+	}//End printTable() Method
 	
 }//End TableDoubleHash Class
 
