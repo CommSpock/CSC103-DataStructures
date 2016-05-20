@@ -5,13 +5,14 @@
 // Due Date: Monday 5/22/16
 
 /****************************************************************************************************
-* The HashTesting program analyzes the efficiency of adding elements to an open-address hash table 
+* This HashTesting program analyzes the efficiency of adding elements to an open-address hash table 
 * versus adding elements to a double hash table. Both tables have a fixed capacity of 241 elements.
 * The same elements with the same keys are added to each table in the same order. The elements are 
 * read from a text file that contains a single name and integer key on each line. Both tables use 
 * Java's hashCode method in their initial identical hash functions, with the double hash table using 
 * a modified second hash function (still using hashCode) to perform double hashing. The analysis
 * reports information about the number of collisions that occur when adding elements to each hash table.
+* The HashTesting class works in conjunction with the Table and TableDoubleHash classes.
 * 
 * @note
 * 	(1) The file selected by the user must contain a single (one word) name and a single integer 
@@ -22,6 +23,8 @@
 *   <p>
 *   (3) The tracking of collisions is handled by the Table and TableDoubleHash classes.
 *
+* @author Rafael Ferrer
+* 
 * @version
 *   May 20, 2016
 ****************************************************************************************************/
