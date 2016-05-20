@@ -5,9 +5,9 @@
 // Due Date: Monday 5/22/16
 
 /****************************************************************************************************
-* A Table is an open-address hash table with a fixed capacity. The purpose is to show students how 
-* an open-address hash table is implemented. Programs should generally use java.util.Hashtable
-* rather than this hash table.
+* A Table is an open-address hash table with a fixed capacity. This table has been modified to track 
+* and store statistics about the number of collisions that occur when an element is added to it. 
+* The Table class is used in conjunction with the HashTesting class.
 *
 * <dt><b>Java Source Code for this class:</b><dd>
 *   <A HREF="../../../../edu/colorado/collections/Table.java">
@@ -16,9 +16,10 @@
 *
 * @author Michael Main 
 *   <A HREF="mailto:main@colorado.edu"> (main@colorado.edu) </A>
+* @author Rafael Ferrer
 *
 * @version
-*   May 12, 2016
+*   May 20, 2016
 ****************************************************************************************************/
 
 
@@ -32,6 +33,8 @@ public class Table< K , E >
 	//      the element’s key is placed at keys[i].
 	//   3. An index i that is not currently used has data[i] and key[i] set to null.
 	//   4. If an index i has been used at some point (now or in the past), then hasBeenUsed[i] is true; otherwise it is false.
+	//   5. The instance variables avgCollisions, maxCollisions, firstCollisions, and totalCollisions store statistical data
+	//      about the number of collisions that occur in a table when adding elements.
 	
 	/// Private Instance Variables ///
 	
@@ -72,7 +75,62 @@ public class Table< K , E >
 	
 	
 	/// Accessor Methods ///
+	
+	/**
+	 * Returns the number of elements that are currently in this Table.
+	 * @return
+	 *   The number of elements that are currently in this Table.  
+	 **/
+	public double getElementCount()
+	{
+		return manyItems;
 		
+	}//End getElementCount() Method
+	
+	/**
+	 * Returns the average number of collisions experienced by each element added to Table.
+	 * @return
+	 *   The average number of collisions experienced by each element added to Table.
+	 **/
+	public double getAvgCollisions()
+	{
+		return avgCollisions;
+		
+	}//End getAvgCollisions() Method
+	
+	/**
+	 * Returns the maximum number of collisions experienced by a single element added to Table.
+	 * @return
+	 *   The maximum number of collisions experienced by a single element added to Table.
+	 **/
+	public int getMaxCollisions()
+	{
+		return maxCollisions;
+		
+	}//End getMaxCollisions() Method
+	
+	/**
+	 * Returns the number of elements that experienced any collisions when added to Table.
+	 * @return
+	 *   The number of elements that experienced any collisions when added to Table.
+	 **/
+	public int getFirstCollisions()
+	{
+		return firstCollisions;
+		
+	}//End getFirstCollisions() Method
+	
+	/**
+	 * Returns the total sum of collisions that occurred after adding all elements to Table.
+	 * @return
+	 *   The total sum of collisions that occurred after adding all elements to Table.
+	 **/
+	public int getTotalCollisions()
+	{
+		return totalCollisions;
+		
+	}//End getTotalCollisions() Method
+	
 	/** 
 	 * Retrieves an object for a specified key.
 	 * @param key
@@ -118,19 +176,54 @@ public class Table< K , E >
 		
 	}//End containsKey(K key) Method
 	
+	
+	/// Private Hashing Related Methods ///
+	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * Hash function that returns the index of the Table's array that corresponds to the provided key.
+	 * @param key
+	 *   The non-null key to hash.
 	 * @precondition
-	 *   
+	 *   Key cannot be null.
+	 * @return
+	 *  The return value is a valid index of the Table’s arrays. The index is calculated as the remainder 
+	 *  when the absolute value of the key’s hash code is divided by the size of the table’s arrays.
+	 **/
+	private int hash(Object key)
+	{
+		return Math.abs(key.hashCode( )) % data.length;
+		
+	}//End hash(Object key) Method
+	
+	/**
+	 * Returns the next index an element should try to be placed at if a collision occurs.
+	 * @param index
+	 *   The current index where the collision occurred.
+	 * @precondition
+	 *   Index must be a valid index of this Table's arrays.
+	 * @return
+	 *   The return value is normally i+1. But if i+1 is data.length, then the return value is zero instead. 
+	 **/
+	private int nextIndex(int index)
+	{
+		if (index + 1 == data.length){
+			return 0;
+		}
+		else {
+			return index + 1;
+		}
+	
+	}//End nextIndex(int i) Method
+	
+	/**
+	 * Returns the index that is mapped to a given key.
+	 * @param key
+	 *   The non-null key to map.
+	 * @precondition
+	 *   Key cannot be null.
 	 * @return
 	 *   If the specified key is found in the table, then the return value is the index of the specified key. 
 	 *   Otherwise, the return value is -1.
-	 * @exception
-	 *   
-	 * @note
-	 *   
 	 **/
 	private int findIndex(K key)
 	{
@@ -150,128 +243,8 @@ public class Table< K , E >
 		
 	}//End findIndex(K key) Method
 	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   The return value is normally i+1. But if i+1 is data.length, then the return value is zero instead.
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	private int nextIndex(int i)
-	{
-		if (i+1 == data.length){
-			return 0;
-		}
-		else {
-			return i+1;
-		}
-	
-	}//End nextIndex(int i) Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public double getAvgCollisions()
-	{
-		return avgCollisions;
-		
-	}//End getAvgCollisions() Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public int getMaxCollisions()
-	{
-		return maxCollisions;
-		
-	}//End getMaxCollisions() Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public int getFirstCollisions()
-	{
-		return firstCollisions;
-		
-	}//End getFirstCollisions() Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public int getTotalCollisions()
-	{
-		return totalCollisions;
-		
-	}//End getTotalCollisions() Method
-	
 	
 	/// Modifier Methods ///
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *  The return value is a valid index of the table’s arrays. The index is calculated as the remainder 
-	 *  when the absolute value of the key’s hash code is divided by the size of the table’s arrays.
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	private int hash(Object key)
-	{
-		return Math.abs(key.hashCode( )) % data.length;
-		
-	}//End hash(Object key) Method
 	
 	/**
 	 * Add a new element to this table, using the specified key.
@@ -290,7 +263,13 @@ public class Table< K , E >
 	 * @exception IllegalStateException
 	 *   Indicates that there is no room for a new object in this table.
 	 * @exception NullPointerException
-	 *   Indicates that key or element is null.   
+	 *   Indicates that key or element is null.
+	 * @note
+	 *   This method also calculates statistics on collisions that occur when trying to add new elements to the table.
+	 *   > The average number of collisions experienced by each element added to Table.
+	 *   > The maximum number of collisions experienced by a single element added to Table.
+	 *   > The number of elements that experienced any collisions when added to Table.
+	 *   > The total sum of collisions that occurred after adding all elements to Table.
 	 **/
 	@SuppressWarnings("unchecked") //answer = (E) data[index];
 	public E put(K key, E element)
@@ -320,6 +299,7 @@ public class Table< K , E >
 			data[index] = element;
 			hasBeenUsed[index] = true;
 			++manyItems;
+			//Calculate collision statistics
 			totalCollisions = totalCollisions + elementCollisions;
 			avgCollisions = (((((double) manyItems) - 1)*avgCollisions)+elementCollisions)/((double) manyItems);
 			if (elementCollisions > maxCollisions){
@@ -364,18 +344,13 @@ public class Table< K , E >
 		
 	}//End remove(K key) Class
 	
+	
+	/// Additional Methods Used for Testing ///
+	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * Prints the element at every index of the Table. Used in testing and analysis of Table.
+	 * @postcondition
+	 *   Every index of the Table has been printed.
 	 **/
 	public void printTable()
 	{		
@@ -386,10 +361,7 @@ public class Table< K , E >
 			i = i + 4;
 		}
 		i = 240;
-		while (i < 241){
-			System.out.println(i + "  " + data[i]);
-			i++;
-		}
+		System.out.println(i + "  " + data[i]);
 		
 	}//End printTable() Method
 	
