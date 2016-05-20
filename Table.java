@@ -1,7 +1,7 @@
 // File: Table.java
 
 // Project #4: Analysis of Hashing versus Double Hashing
-// Authors: Rafael Ferrer and Carmen Chiu
+// Authors: Rafael Ferrer
 // Due Date: Monday 5/22/16
 
 /****************************************************************************************************
@@ -36,6 +36,10 @@ public class Table< K , E >
 	/// Private Instance Variables ///
 	
 	private int manyItems;
+	private double avgCollisions;
+	private int maxCollisions;
+	private int firstCollisions;
+	private int totalCollisions;
 	private Object[] keys;
 	private Object[] data;
 	private boolean[] hasBeenUsed;   
@@ -170,6 +174,82 @@ public class Table< K , E >
 	
 	}//End nextIndex(int i) Method
 	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public double getAvgCollisions()
+	{
+		return avgCollisions;
+		
+	}//End getAvgCollisions() Method
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public int getMaxCollisions()
+	{
+		return maxCollisions;
+		
+	}//End getMaxCollisions() Method
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public int getFirstCollisions()
+	{
+		return firstCollisions;
+		
+	}//End getFirstCollisions() Method
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public int getTotalCollisions()
+	{
+		return totalCollisions;
+		
+	}//End getTotalCollisions() Method
+	
 	
 	/// Modifier Methods ///
 	
@@ -217,6 +297,7 @@ public class Table< K , E >
 	{
 		//Instance Variables
 		int index = findIndex(key);
+		int elementCollisions = 0;
 		E answer;
 		
 		// The key is already in the table.
@@ -228,13 +309,22 @@ public class Table< K , E >
 		// The key is not yet in this Table.
 		else if (manyItems < data.length){
 			index = hash(key);
+			if (keys[index] != null){
+				firstCollisions++;
+			}
 			while (keys[index] != null){
 				index = nextIndex(index);
+				elementCollisions++;
 			}
 			keys[index] = key;
 			data[index] = element;
 			hasBeenUsed[index] = true;
-			manyItems++;
+			++manyItems;
+			totalCollisions = totalCollisions + elementCollisions;
+			avgCollisions = (((((double) manyItems) - 1)*avgCollisions)+elementCollisions)/((double) manyItems);
+			if (elementCollisions > maxCollisions){
+				maxCollisions = elementCollisions;
+			}
 			return null;
 		}//end else if
 		// The table is full.
@@ -273,6 +363,35 @@ public class Table< K , E >
 		return answer;
 		
 	}//End remove(K key) Class
+	
+	/**
+	 * Description
+	 * @param
+	 *   
+	 * @precondition
+	 *   
+	 * @postcondition / return
+	 *   
+	 * @exception
+	 *   
+	 * @note
+	 *   
+	 **/
+	public void printTable()
+	{		
+		int i = 0;
+		
+		while (i < 240){
+			System.out.println(i + "  " + data[i] + "\t\t" + (i+1) + "  " + data[i+1] + "\t\t" + (i+2) + "  " + data[i+2] + "\t\t" + (i+3) + "  " + data[i+3]);
+			i = i + 4;
+		}
+		i = 240;
+		while (i < 241){
+			System.out.println(i + "  " + data[i]);
+			i++;
+		}
+		
+	}//End printTable() Method
 	
 }//End Table Class
 
