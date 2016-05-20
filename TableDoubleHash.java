@@ -5,9 +5,9 @@
 // Due Date: Monday 5/22/16
 
 /****************************************************************************************************
-* A Table is an open-address hash table with a fixed capacity. The purpose is to show students how 
-* an open-address hash table is implemented. Programs should generally use java.util.Hashtable
-* rather than this hash table.
+* A TableDoubleHash is a double hash table with a fixed capacity. This table has been modified to 
+* track and store statistics about the number of collisions that occur when an element is added to it. 
+* The TableDoubleHash class is used in conjunction with the HashTesting class.
 *
 * <dt><b>Java Source Code for this class:</b><dd>
 *   <A HREF="../../../../edu/colorado/collections/Table.java">
@@ -16,9 +16,10 @@
 *
 * @author Michael Main 
 *   <A HREF="mailto:main@colorado.edu"> (main@colorado.edu) </A>
-*   
+* @author Rafael Ferrer
+* 
 * @version
-*   May 12, 2016
+*   May 20, 2016
 ****************************************************************************************************/
 
 
@@ -32,6 +33,8 @@ public class TableDoubleHash< K , E >
 	//      the element’s key is placed at keys[i].
 	//   3. An index i that is not currently used has data[i] and key[i] set to null.
 	//   4. If an index i has been used at some point (now or in the past), then hasBeenUsed[i] is true; otherwise it is false.
+    //   5. The instance variables avgCollisions, maxCollisions, firstCollisions, and totalCollisions store statistical data
+	//      about the number of collisions that occur in a table when adding elements.
 	
 	/// Private Instance Variables ///
 	
@@ -50,7 +53,7 @@ public class TableDoubleHash< K , E >
 	/**
 	 * Initialize an empty table with a specified capacity.
 	 * @param capacity
-	 *   The capacity for this new open-address hash table.
+	 *   The capacity for this new double hash table.
 	 * @postcondition
 	 *   This table is empty and has the specified capacity.
 	 * @exception OutOfMemoryError
@@ -72,7 +75,62 @@ public class TableDoubleHash< K , E >
 	
 	
 	/// Accessor Methods ///
+	
+	/**
+	 * Returns the number of elements that are currently in this TableDoubleHash.
+	 * @return
+	 *   The number of elements that are currently in this TableDoubleHash.  
+	 **/
+	public double getElementCount()
+	{
+		return manyItems;
 		
+	}//End getElementCount() Method
+	
+	/**
+	 * Returns the average number of collisions experienced by each element added to TableDoubleHash.
+	 * @return
+	 *   The average number of collisions experienced by each element added to TableDoubleHash.
+	 **/
+	public double getAvgCollisions()
+	{
+		return avgCollisions;
+		
+	}//End getAvgCollisions() Method
+	
+	/**
+	 * Returns the maximum number of collisions experienced by a single element added to TableDoubleHash.
+	 * @return
+	 *   The maximum number of collisions experienced by a single element added to TableDoubleHash.
+	 **/
+	public int getMaxCollisions()
+	{
+		return maxCollisions;
+		
+	}//End getMaxCollisions() Method
+	
+	/**
+	 * Returns the number of elements that experienced any collisions when added to TableDoubleHash.
+	 * @return
+	 *   The number of elements that experienced any collisions when added to TableDoubleHash. 
+	 **/
+	public int getFirstCollisions()
+	{
+		return firstCollisions;
+		
+	}//End getFirstCollisions() Method
+	
+	/**
+	 * Returns the total sum of collisions that occurred after adding all elements to TableDoubleHash.
+	 * @return
+	 *   The total sum of collisions that occurred after adding all elements to TableDoubleHash.
+	 **/
+	public int getTotalCollisions()
+	{
+		return totalCollisions;
+		
+	}//End getTotalCollisions() Method
+	
 	/** 
 	 * Retrieves an object for a specified key.
 	 * @param key
@@ -80,8 +138,8 @@ public class TableDoubleHash< K , E >
 	 * @precondition
 	 *   Key cannot be null.
 	 * @return
-	 *   A reference to the object with the specified key (if this table contains an such an object);  null otherwise. 
-	 *   Note that key.equals( ) is used to compare the key to the keys that are in the table.
+	 *   A reference to the object with the specified key (if this TableDoubleHash contains an such an object);  null otherwise. 
+	 *   Note that key.equals( ) is used to compare the key to the keys that are in the TableDoubleHash.
 	 * @exception NullPointerException
 	 *   Indicates that key is null.
 	 **/
@@ -101,14 +159,14 @@ public class TableDoubleHash< K , E >
 	}//End get(K key) Method
 	
 	/**
-	 * Determines whether a specified key is in this table.
+	 * Determines whether a specified key is in this TableDoubleHash.
 	 * @param key
 	 *   The non-null key to look for.
 	 * @precondition
 	 *   Key cannot be null.
 	 * @return
-	 *   true (if this table contains an object with the specified key); false otherwise.
-	 *   Note that key.equals( ) is used to compare the key to the keys that are in the table.
+	 *   True (if this TableDoubleHash contains an object with the specified key); false otherwise.
+	 *   Note that key.equals( ) is used to compare the key to the keys that are in the TableDoubleHash.
 	 * @exception NullPointerException
 	 *   Indicates that key is null.
 	 **/
@@ -118,19 +176,63 @@ public class TableDoubleHash< K , E >
 		
 	}//End containsKey(K key) Method
 	
+	
+	/// Private Hashing Related Methods ///
+	
 	/**
-	 * Description
-	 * @param
-	 *   
+	 * The first hash function that returns the index of the TableDoubleHash's array that corresponds to the provided key.
+	 * @param key
+	 *   The non-null key to hash.
 	 * @precondition
-	 *   
+	 *   Key cannot be null.
 	 * @return
-	 *   If the specified key is found in the table, then the return value is the index of the specified key. 
+	 *  The return value is a valid index of the TableDoubleHash's arrays. The index is calculated as the remainder 
+	 *  when the absolute value of the key’s hash code is divided by the size of the TableDoubleHash's arrays.
+	 **/
+	private int hash(Object key)
+	{
+		return Math.abs(key.hashCode( )) % data.length;
+		
+	}//End hash(Object key) Method
+	
+	/**
+	 * The second hash function that returns the index of the TableDoubleHash's array that corresponds to the provided key.
+	 * @param key
+	 *   The non-null key to hash.
+	 * @precondition
+	 *   Key cannot be null.
+	 * @return
+	 *  The return value is a valid index of the TableDoubleHash's arrays. The index is calculated as the remainder 
+	 *  when the absolute value of the key’s hash code is divided by the size of the TableDoubleHash's arrays minus two.
+	 **/
+	private int doubleHash(Object key)
+	{
+		return Math.abs(key.hashCode( )) % (data.length-2);
+		
+	}//End hash(Object key) Method
+	
+	/**
+	 * Returns the next index an element should try to be placed at if a collision occurs.
+	 * @param index
+	 *   The current index where the collision occurred.
+	 * @return
+	 *   The return value is calculated by the second hash function, doubleHash().
+	 **/
+	private int nextIndex(int index, K key)
+	{
+		return (index + doubleHash(key)) % data.length;
+	
+	}//End nextIndex(int i) Method
+	
+	/**
+	 * Returns the index that is mapped to a given key.
+	 * @param key
+	 *   The non-null key to map.
+	 * @precondition
+	 *   Key cannot be null.
+	 * @return
+	 *   If the specified key is found in the TableDoubleHash, then the return value is the index of the specified key. 
 	 *   Otherwise, the return value is -1.
-	 * @exception
-	 *   
-	 * @note
-	 *   
 	 **/
 	private int findIndex(K key)
 	{
@@ -150,162 +252,33 @@ public class TableDoubleHash< K , E >
 		
 	}//End findIndex(K key) Method
 	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   The return value is normally i+1. But if i+1 is data.length, then the return value is zero instead.
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	private int nextIndex(int i, K key)
-	{
-		return (i + doubleHash(key)) % data.length;
-	
-	}//End nextIndex(int i) Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public double getAvgCollisions()
-	{
-		return avgCollisions;
-		
-	}//End getAvgCollisions() Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public int getMaxCollisions()
-	{
-		return maxCollisions;
-		
-	}//End getMaxCollisions() Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public int getFirstCollisions()
-	{
-		return firstCollisions;
-		
-	}//End getFirstCollisions() Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	public int getTotalCollisions()
-	{
-		return totalCollisions;
-		
-	}//End getTotalCollisions() Method
-	
 	
 	/// Modifier Methods ///
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *  The return value is a valid index of the table’s arrays. The index is calculated as the remainder 
-	 *  when the absolute value of the key’s hash code is divided by the size of the table’s arrays.
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	private int hash(Object key)
-	{
-		return Math.abs(key.hashCode( )) % data.length;
-		
-	}//End hash(Object key) Method
-	
-	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @return
-	 *  The return value is a valid index of the table’s arrays. The index is calculated as the remainder 
-	 *  when the absolute value of the key’s hash code is divided by the size of the table’s arrays.
-	 * @exception
-	 *   
-	 * @note
-	 *   
-	 **/
-	private int doubleHash(Object key)
-	{
-		return Math.abs(key.hashCode( )) % (data.length-2);
-		
-	}//End hash(Object key) Method
 	
 	/**
 	 * Add a new element to this table, using the specified key.
 	 * @param key
 	 *   The non-null key to use for the new element.
 	 * @param element
-	 *   The new element that’s being added to this table.
+	 *   The new element that’s being added to this TableDoubleHash.
 	 * @precondition
-	 *   If there is not already an element with the specified key, then this table’s 
+	 *   If there is not already an element with the specified key, then this TableDoubleHash's 
 	 *   size must be less than its capacity (i.e., size() < capacity()). 
 	 *   Also, neither key nor element is null.
 	 * @return
-	 *   If this table already has an object with the specified key, then that object is 
+	 *   If this TableDoubleHash already has an object with the specified key, then that object is 
 	 *   replaced by element, and the return value is a reference to the replaced object. 
 	 *   Otherwise, the new element is added with the specified key and the return value is null.
 	 * @exception IllegalStateException
-	 *   Indicates that there is no room for a new object in this table.
+	 *   Indicates that there is no room for a new object in this TableDoubleHash.
 	 * @exception NullPointerException
-	 *   Indicates that key or element is null.   
+	 *   Indicates that key or element is null.
+	 * @note
+	 *   This method also calculates statistics on collisions that occur when trying to add new elements to the TableDoubleHash.
+	 *   > The average number of collisions experienced by each element added to TableDoubleHash.
+	 *   > The maximum number of collisions experienced by a single element added to TableDoubleHash.
+	 *   > The number of elements that experienced any collisions when added to TableDoubleHash.
+	 *   > The total sum of collisions that occurred after adding all elements to TableDoubleHash.
 	 **/
 	@SuppressWarnings("unchecked") //answer = (E) data[index];
 	public E put(K key, E element)
@@ -335,6 +308,7 @@ public class TableDoubleHash< K , E >
 			data[index] = element;
 			hasBeenUsed[index] = true;
 			++manyItems;
+			//Calculate collision statistics
 			totalCollisions = totalCollisions + elementCollisions;
 			avgCollisions = (((((double) manyItems) - 1)*avgCollisions)+elementCollisions)/((double) manyItems);
 			if (elementCollisions > maxCollisions){
@@ -356,9 +330,9 @@ public class TableDoubleHash< K , E >
 	 * @precondition
 	 *   Key cannot be null.
 	 * @return
-	 *   If an object was found with the specified key, then that object has been removed from this table and 
+	 *   If an object was found with the specified key, then that object has been removed from this TableDoubleHash and 
 	 *   a copy of the removed object is returned; otherwise, this table is unchanged and the null reference is returned. 
-	 *   Note that key.equals( ) is used to compare the key to the keys that are in the table.
+	 *   Note that key.equals( ) is used to compare the key to the keys that are in the TableDoubleHash.
 	 * @exception NullPointerException
 	 *   Indicates that key is null.
 	 **/
@@ -379,18 +353,13 @@ public class TableDoubleHash< K , E >
 		
 	}//End remove(K key) Class
 	
+	
+	/// Additional Methods Used for Testing ///
+	
 	/**
-	 * Description
-	 * @param
-	 *   
-	 * @precondition
-	 *   
-	 * @postcondition / return
-	 *   
-	 * @exception
-	 *   
-	 * @note
-	 *   
+	 * Prints the element at every index of the Table. Used in testing and analysis of Table.
+	 * @postcondition
+	 *   Every index of the Table has been printed.
 	 **/
 	public void printTable()
 	{		
@@ -401,10 +370,7 @@ public class TableDoubleHash< K , E >
 			i = i + 4;
 		}
 		i = 240;
-		while (i < 241){
-			System.out.println(i + "  " + data[i]);
-			i++;
-		}
+		System.out.println(i + "  " + data[i]);
 		
 	}//End printTable() Method
 	
